@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { api, ApiError, dashboardPathFor, type Role } from "@/lib/api";
 import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/Button";
@@ -11,6 +11,14 @@ import { Field } from "@/components/Field";
 type SignupRole = "freelancer" | "klient";
 
 export default function RegisterPage() {
+  return (
+    <Suspense fallback={null}>
+      <RegisterForm />
+    </Suspense>
+  );
+}
+
+function RegisterForm() {
   const router = useRouter();
   const params = useSearchParams();
   const { signIn } = useAuth();
