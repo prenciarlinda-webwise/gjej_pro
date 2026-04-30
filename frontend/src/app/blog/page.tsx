@@ -7,7 +7,7 @@ import { serverApi, SITE } from "@/lib/server-api";
 export const metadata: Metadata = {
   title: `Blog | ${SITE.name}`,
   description:
-    "Këshilla, udhëzues dhe histori nga komuniteti i Gjej Pro — për klientët dhe profesionistët.",
+    "Këshilla, udhëzues dhe histori nga komuniteti i Gjej Pro, për klientët dhe profesionistët.",
   alternates: { canonical: `${SITE.url}/blog` },
 };
 

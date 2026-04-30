@@ -10,7 +10,7 @@ import { ReadOnlyStars } from "@/components/StarRating";
 import { SITE } from "@/lib/server-api";
 
 export const metadata: Metadata = {
-  title: `Për profesionistët — Bëhuni pjesë e Gjej Pro | ${SITE.name}`,
+  title: `Për profesionistët | Bëhuni pjesë e Gjej Pro | ${SITE.name}`,
   description:
     "Merrni klientë të rinj çdo ditë në Gjej Pro. Pa pagesë mujore, pa komisione. Krijoni profilin tuaj në më pak se 5 minuta.",
   alternates: { canonical: `${SITE.url}/per-profesionistet` },
@@ -36,8 +36,9 @@ export default function ForProfessionalsPage() {
                   <span className="italic text-forest">Më pak përpjekje.</span>
                 </h1>
                 <p className="mt-6 text-lg text-ink-muted max-w-xl leading-relaxed">
-                  Bashkohuni me qindra mjeshtra në Shqipëri që marrin punë të
-                  reja çdo ditë përmes Gjej Pro.
+                  Listoni shërbimet tuaja, merrni kërkesa nga klientë të
+                  verifikuar dhe ndërtoni reputacionin tuaj në platformën më
+                  të re shqiptare.
                 </p>
                 <div className="mt-8 flex flex-wrap gap-3">
                   <Link href="/regjistrohu?role=freelancer">
@@ -52,10 +53,6 @@ export default function ForProfessionalsPage() {
                   </Link>
                 </div>
 
-                <div className="mt-8 flex items-center gap-3 text-sm text-stone">
-                  <ReadOnlyStars rating={5} size={14} />
-                  <span>Vlerësuar 4.9/5 nga 500+ profesionistë</span>
-                </div>
               </div>
 
               {/* Layered card composition — pricing/earnings preview */}
@@ -75,14 +72,69 @@ export default function ForProfessionalsPage() {
             />
             <BenefitCard
               icon="key"
-              title="Pa komisione"
-              body="Çmimi që ofron është çmimi që merr. Klienti dhe ti merreni vesh direkt."
+              title="0% komision platforme"
+              body="Çmimi që ofron është çmimi që merr. Gjej Pro nuk mban përqindje nga puna juaj."
             />
             <BenefitCard
               icon="monitor"
               title="Klientë seriozë"
               body="Çdo klient verifikon emailin para se të kontaktojë. Pa numra të rremë, pa kohë të humbur."
             />
+          </div>
+        </section>
+
+        <section className="border-t border-line bg-bg">
+          <div className="max-w-6xl mx-auto px-6 sm:px-8 py-20">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+              <div>
+                <p className="text-xs uppercase tracking-wider text-stone mb-3">
+                  E vërteta për komisionet
+                </p>
+                <h2 className="font-display text-4xl sm:text-5xl text-ink leading-[1.05]">
+                  Mbani 100% të{" "}
+                  <span className="italic text-forest">çdo pune.</span>
+                </h2>
+                <p className="mt-5 text-base text-ink-muted leading-relaxed max-w-xl">
+                  Platformat e tjera marrin deri në <strong>20%</strong> nga
+                  çmimi i çdo pune. Në një muaj me 2,000 € të ardhura, kjo
+                  do të thotë <strong>400 € të humbura</strong>. Në një vit:
+                  4,800 €.
+                </p>
+                <p className="mt-3 text-base text-ink-muted leading-relaxed max-w-xl">
+                  Gjej Pro merr <strong>0%</strong> nga vlera e punës. Pa
+                  pagesa mujore. Pa tarifa të fshehura. Pa &ldquo;premium
+                  plan&rdquo; që dyfishon shikueshmërinë tuaj.
+                </p>
+                <p className="mt-3 text-base text-ink-muted leading-relaxed max-w-xl">
+                  Kur vjen aplikacioni, pagesat online do të bëhen drejt
+                  klient → profesionist, brenda platformës. Pa komision
+                  Gjej Pro, vetëm tarifa standarde e procesorit të kartës.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="rounded-2xl border border-line bg-surface p-6 text-center shadow-md">
+                  <div className="text-xs uppercase tracking-wider text-stone">
+                    Platformat e tjera
+                  </div>
+                  <div className="mt-3 font-display text-5xl numeric text-ink-muted line-through decoration-danger decoration-4">
+                    20%
+                  </div>
+                  <p className="mt-3 text-xs text-ink-muted">
+                    Komision nga çdo punë
+                  </p>
+                </div>
+                <div className="rounded-2xl border border-forest bg-forest text-white p-6 text-center shadow-md">
+                  <div className="text-xs uppercase tracking-wider text-white/70">
+                    Gjej Pro
+                  </div>
+                  <div className="mt-3 font-display text-5xl numeric">0%</div>
+                  <p className="mt-3 text-xs text-white/80">
+                    Komision platforme
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
         </section>
 
@@ -131,7 +183,7 @@ export default function ForProfessionalsPage() {
             />
             <div className="relative">
               <h2 className="font-display text-3xl sm:text-4xl max-w-3xl">
-                Bëhuni pjesë e komunitetit më të madh të mjeshtrave shqiptarë.
+                Listoni shërbimet tuaja në Gjej Pro.
               </h2>
               <p className="mt-3 text-white/80 max-w-2xl">
                 Sa më shpejt të krijoni profilin, aq më shumë klientë do
@@ -142,9 +194,9 @@ export default function ForProfessionalsPage() {
                   <Button
                     variant="primary"
                     size="lg"
-                    className="bg-white text-forest hover:bg-white/90"
+                    className="!bg-white !text-forest hover:!bg-white/90"
                   >
-                    Filloni tani — falas
+                    Filloni tani, falas
                   </Button>
                 </Link>
               </div>

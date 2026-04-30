@@ -21,7 +21,7 @@ export async function generateMetadata({ params }: RouteParams): Promise<Metadat
   const { slug } = await params;
   const cat = await getCategory(slug);
   if (!cat) return { title: `Faqja nuk u gjet | ${SITE.name}` };
-  const title = `${cat.name} në Shqipëri — Gjej profesionistin | ${SITE.name}`;
+  const title = `${cat.name} në Shqipëri | Gjej profesionistin | ${SITE.name}`;
   const description = `Gjeni ${cat.name.toLowerCase()} të verifikuar në Shqipëri. Krahasoni çmimet, vlerësimet dhe zonat e punës. Përgjigje brenda orëve.`;
   return {
     title,

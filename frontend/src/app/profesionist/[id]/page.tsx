@@ -15,10 +15,10 @@ export async function generateMetadata({ params }: RouteParams): Promise<Metadat
   const { id } = await params;
   const profile = await serverApi.freelancer(Number(id));
   if (!profile) {
-    return { title: `Profesionisti nuk u gjet — ${SITE.name}` };
+    return { title: `Profesionisti nuk u gjet | ${SITE.name}` };
   }
   const cats = profile.categories.map((c) => c.name).join(", ");
-  const title = `${profile.full_name}${profile.headline ? " — " + profile.headline : ""} | ${SITE.name}`;
+  const title = `${profile.full_name}${profile.headline ? " | " + profile.headline : ""} | ${SITE.name}`;
   const description =
     (profile.bio || profile.headline || `Profesionist i listuar në ${SITE.name}.`)
       .replace(/\s+/g, " ")

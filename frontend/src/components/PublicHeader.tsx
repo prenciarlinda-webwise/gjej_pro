@@ -11,8 +11,8 @@ export function PublicHeader() {
 
   return (
     <header className="border-b border-line bg-bg/90 backdrop-blur sticky top-0 z-10">
-      <div className="max-w-6xl mx-auto px-6 sm:px-8 py-4 flex items-center justify-between gap-4">
-        <Logo size={44} />
+      <div className="max-w-6xl mx-auto px-6 sm:px-8 py-3 flex items-center justify-between gap-4">
+        <Logo size={84} />
         <nav className="flex items-center gap-1.5 flex-wrap justify-end">
           <Link href="/profesionistet" className="hidden sm:inline-block">
             <Button variant="ghost" size="md">

@@ -13,6 +13,7 @@ import { FreelancerCard } from "@/components/FreelancerCard";
 import { Field } from "@/components/Field";
 import { Button } from "@/components/Button";
 import { HeroDecoration } from "@/components/HeroDecoration";
+import { MapView, type MapPin } from "@/components/MapView";
 
 const ALBANIAN_CITIES = [
   "Tiranë", "Durrës", "Vlorë", "Elbasan", "Shkodër",
@@ -211,22 +212,20 @@ export default function FreelancerBrowsePage() {
               <select
                 value={city}
                 onChange={(e) => {
-                  setCity(e.target.value);
+                  const next = e.target.value;
+                  setCity(next);
+                  if (next && coords) {
+                    setCoords(null);
+                  }
                   setPage(1);
                 }}
                 className="w-full rounded-md border border-line bg-surface px-3 py-2 text-sm text-ink focus:outline-none focus:ring-2 focus:ring-forest/15"
-                disabled={!!coords}
               >
                 <option value="">Të gjitha</option>
                 {ALBANIAN_CITIES.map((c) => (
                   <option key={c} value={c}>{c}</option>
                 ))}
               </select>
-              {coords && (
-                <p className="text-[10px] text-stone">
-                  Filtri i qytetit është çaktivizuar gjatë kërkimit me vendndodhje.
-                </p>
-              )}
             </FilterGroup>
 
             <label className="flex items-center gap-2 text-sm text-ink cursor-pointer">
@@ -258,6 +257,19 @@ export default function FreelancerBrowsePage() {
                   Brenda {radiusKm} km nga ju
                 </span>
               )}
+            </div>
+
+            <div className="mt-4">
+              <MapView
+                pins={(results?.results ?? []).map<MapPin>((f) => ({
+                  id: f.id,
+                  name: f.full_name,
+                  subtitle: f.headline || f.categories[0]?.name,
+                  city: f.cities[0],
+                }))}
+                userCoords={coords}
+                height={340}
+              />
             </div>
 
             <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">

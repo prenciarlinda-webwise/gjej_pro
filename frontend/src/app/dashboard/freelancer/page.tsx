@@ -29,7 +29,7 @@ export default function FreelancerDashboard() {
       </h1>
       <p className="mt-2 text-sm text-ink-muted max-w-2xl">
         Llogaria juaj është krijuar. Hapi tjetër është të plotësoni profilin
-        tuaj — shërbimet që ofroni, kategoritë dhe zonat ku punoni.
+        tuaj: shërbimet që ofroni, kategoritë dhe zonat ku punoni.
       </p>
 
       <section className="mt-8 grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6">

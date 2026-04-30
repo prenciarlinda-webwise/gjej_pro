@@ -87,7 +87,11 @@ function RegisterForm() {
 
       <RoleTabs value={role} onChange={setRole} />
 
-      <form onSubmit={onSubmit} className="mt-6 flex flex-col gap-4">
+      <form
+        onSubmit={onSubmit}
+        autoComplete="off"
+        className="mt-6 flex flex-col gap-4"
+      >
         {errors.detail && (
           <div className="rounded-lg border border-danger/30 bg-danger/5 px-4 py-3 text-sm text-danger">
             {errors.detail}
@@ -98,7 +102,7 @@ function RegisterForm() {
           <Field
             label="Emri"
             name="first_name"
-            autoComplete="given-name"
+            autoComplete="off"
             required
             value={form.first_name}
             onChange={(e) => update("first_name", e.target.value)}
@@ -107,7 +111,7 @@ function RegisterForm() {
           <Field
             label="Mbiemri"
             name="last_name"
-            autoComplete="family-name"
+            autoComplete="off"
             required
             value={form.last_name}
             onChange={(e) => update("last_name", e.target.value)}
@@ -119,7 +123,7 @@ function RegisterForm() {
           label="Email"
           type="email"
           name="email"
-          autoComplete="email"
+          autoComplete="off"
           required
           value={form.email}
           onChange={(e) => update("email", e.target.value)}
@@ -130,7 +134,7 @@ function RegisterForm() {
           label="Numri i telefonit"
           type="tel"
           name="phone"
-          autoComplete="tel"
+          autoComplete="off"
           placeholder="+355 ..."
           value={form.phone}
           onChange={(e) => update("phone", e.target.value)}
@@ -142,8 +146,8 @@ function RegisterForm() {
           <Field
             label="Emri i kompanisë"
             name="company_name"
-            autoComplete="organization"
-            placeholder="Opsionale — nëse punoni si kompani"
+            autoComplete="off"
+            placeholder="Opsionale, nëse punoni si kompani"
             value={form.company_name}
             onChange={(e) => update("company_name", e.target.value)}
             error={errors.company_name}

@@ -9,7 +9,7 @@ import { serverApi, SITE } from "@/lib/server-api";
 export const metadata: Metadata = {
   title: `Kategoritë e shërbimeve | ${SITE.name}`,
   description:
-    "Të gjitha kategoritë e shërbimeve në Gjej Pro — elektricistë, hidraulikë, bravandreqës, mjeshtra ndërtimi, pastrim shtëpie, dhe shumë të tjera.",
+    "Të gjitha kategoritë e shërbimeve në Gjej Pro: elektricistë, hidraulikë, bravandreqës, mjeshtra ndërtimi, pastrim shtëpie, dhe shumë të tjera.",
   alternates: { canonical: `${SITE.url}/kategorite` },
 };
 

@@ -8,7 +8,7 @@ import { SITE } from "@/lib/server-api";
 export const metadata: Metadata = {
   title: `Pyetjet e shpeshta | ${SITE.name}`,
   description:
-    "Përgjigje për pyetjet më të shpeshta rreth Gjej Pro — si funksionon, si paguani, si verifikohen profesionistët, dhe më shumë.",
+    "Përgjigje për pyetjet më të shpeshta rreth Gjej Pro: si funksionon, si paguani, si verifikohen profesionistët, dhe më shumë.",
   alternates: { canonical: `${SITE.url}/pyetjet-e-shpeshta` },
 };
 
@@ -33,7 +33,7 @@ const SECTIONS: Array<{
       },
       {
         q: "Si paguaj profesionistin?",
-        a: "Pagesa bëhet direkt me profesionistin (cash, transfertë, sipas marrëveshjes). Gjej Pro nuk ndërhyn në pagesa — kjo e mban procesin transparent dhe pa komisione.",
+        a: "Sot pagesa bëhet direkt me profesionistin (cash, transfertë, sipas marrëveshjes). Gjej Pro nuk ndërhyn dhe nuk mban asnjë përqindje. Së shpejti, me aplikacionin për iOS dhe Android, do të mund të paguani online direkt brenda platformës: klient → profesionist, pa komision, pa ndërmjetës.",
       },
     ],
   },
@@ -42,7 +42,7 @@ const SECTIONS: Array<{
     qa: [
       {
         q: "Sa kushton të jem pjesë e Gjej Pro?",
-        a: "Asgjë. Krijimi i profilit, listimi i shërbimeve dhe dorëzimi i ofertave janë krejt falas. Pa pagesë mujore, pa angazhim.",
+        a: "Asgjë. Krijimi i profilit, listimi i shërbimeve dhe dorëzimi i ofertave janë krejt falas. Pa pagesë mujore, pa angazhim. Dhe ndryshe nga platformat e tjera që marrin deri në 20% komision, Gjej Pro nuk mban asnjë përqindje nga puna juaj. 100% e çmimit shkon te ju.",
       },
       {
         q: "Si më gjejnë klientët?",
@@ -87,9 +87,26 @@ export default function FaqPage() {
           Përgjigje për pyetjet më të zakonshme.
         </h1>
         <p className="mt-4 text-base text-ink-muted max-w-2xl">
-          Nuk gjeni atë që po kërkoni? Na shkruani — ekipi ynë i suportit
-          përgjigjet brenda 24 orëve.
+          Gjithçka që duhet të dini për Gjej Pro: si funksionon, si
+          regjistroheni, si paguhen profesionistët, dhe çfarë po vjen më pas.
         </p>
+
+        <div className="mt-10 rounded-2xl bg-forest text-white p-6 sm:p-7 shadow-md">
+          <div className="text-xs uppercase tracking-wider text-white/70">
+            E rëndësishme
+          </div>
+          <h2 className="mt-2 font-display text-2xl sm:text-3xl">
+            0% komision platforme.
+          </h2>
+          <p className="mt-3 text-sm text-white/85 leading-relaxed max-w-2xl">
+            Gjej Pro nuk merr asnjë përqindje nga vlera e punës apo nga
+            pagesa e klientëve. Pa abonime, pa tarifa, pa &ldquo;premium
+            plan&rdquo;. Çmimi i ofertës është çmimi që merr profesionisti.
+            Kur vjen aplikacioni, do të mund të paguani online direkt
+            brenda platformës: vetëm tarifa standarde e procesorit të
+            kartës, asgjë për Gjej Pro.
+          </p>
+        </div>
 
         <div className="mt-12 space-y-12">
           {SECTIONS.map((sec) => (
@@ -121,17 +138,10 @@ export default function FaqPage() {
 
         <section className="mt-16 card p-8 text-center">
           <h2 className="font-display text-2xl text-ink">
-            Keni pyetje tjera?
+            Gati për të filluar?
           </h2>
           <p className="mt-2 text-ink-muted">
-            Kontaktoni ekipin tonë në{" "}
-            <a
-              href="mailto:info@gjejpro.al"
-              className="text-forest font-medium hover:underline"
-            >
-              info@gjejpro.al
-            </a>
-            .
+            Krijoni llogarinë tuaj falas dhe shihni Gjej Pro nga brenda.
           </p>
           <div className="mt-5">
             <Link href="/regjistrohu">

@@ -127,6 +127,6 @@ export const SITE = {
   name: "Gjej Pro",
   tagline: "Profesionistë për ju",
   description:
-    "Platforma më e madhe shqiptare për të gjetur mjeshtër dhe profesionistë të verifikuar — elektricistë, hidraulikë, bravandreqës, pastrues e shumë të tjerë.",
+    "Platforma më e madhe shqiptare për të gjetur mjeshtër dhe profesionistë të verifikuar: elektricistë, hidraulikë, bravandreqës, pastrues e shumë të tjerë.",
   url: process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3002",
 };

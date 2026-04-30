@@ -17,10 +17,12 @@ export function PublicFooter() {
     <footer className="border-t border-line bg-surface mt-16">
       <div className="max-w-6xl mx-auto px-6 sm:px-8 py-12 grid grid-cols-2 sm:grid-cols-4 gap-8">
         <div className="col-span-2 sm:col-span-1">
-          <Logo size={48} />
+          <Logo size={104} />
           <p className="mt-4 text-sm text-ink-muted leading-relaxed max-w-[18rem]">
-            Profesionistë të verifikuar për çdo punë në shtëpi apo biznes —
-            shfletoni, krahasoni, kontaktoni.
+            Falas për të gjithë shqiptarët kudo në botë.
+          </p>
+          <p className="mt-3 text-xs font-medium text-forest max-w-[18rem]">
+            0% komision platforme.
           </p>
         </div>
 

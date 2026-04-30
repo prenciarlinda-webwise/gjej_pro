@@ -15,7 +15,7 @@ export async function generateMetadata({ params }: RouteParams): Promise<Metadat
   const { slug } = await params;
   const city = findCityBySlug(slug);
   if (!city) return { title: `Qyteti nuk u gjet | ${SITE.name}` };
-  const title = `Profesionistë në ${city.name} — Gjej mjeshtrin e duhur | ${SITE.name}`;
+  const title = `Profesionistë në ${city.name} | Gjej mjeshtrin e duhur | ${SITE.name}`;
   const description = `Elektricistë, hidraulikë, bravandreqës, pastrues e shumë profesionistë të tjerë të verifikuar në ${city.name}. Vlerësime reale nga klientët, çmime transparente.`;
   return {
     title,

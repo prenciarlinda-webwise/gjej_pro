@@ -49,7 +49,11 @@ export default function LoginPage() {
         Hyni në llogarinë tuaj për të vazhduar.
       </p>
 
-      <form onSubmit={onSubmit} className="mt-8 flex flex-col gap-4">
+      <form
+        onSubmit={onSubmit}
+        autoComplete="off"
+        className="mt-8 flex flex-col gap-4"
+      >
         {errors.detail && (
           <div className="rounded-lg border border-danger/30 bg-danger/5 px-4 py-3 text-sm text-danger">
             {errors.detail}
@@ -59,7 +63,7 @@ export default function LoginPage() {
           label="Email"
           type="email"
           name="email"
-          autoComplete="email"
+          autoComplete="off"
           required
           value={email}
           onChange={(e) => setEmail(e.target.value)}
@@ -69,7 +73,7 @@ export default function LoginPage() {
           label="Fjalëkalimi"
           type="password"
           name="password"
-          autoComplete="current-password"
+          autoComplete="new-password"
           required
           value={password}
           onChange={(e) => setPassword(e.target.value)}

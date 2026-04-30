@@ -15,7 +15,7 @@ const fraunces = Fraunces({
 });
 
 export const metadata: Metadata = {
-  title: "Gjej Pro — Profesionistë për ju",
+  title: "Gjej Pro | Profesionistë për ju",
   description:
     "Platforma më e madhe shqiptare për të gjetur mjeshtër dhe profesionistë të verifikuar.",
 };

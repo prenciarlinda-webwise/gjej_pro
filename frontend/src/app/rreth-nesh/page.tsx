@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Avatar } from "@/components/Avatar";
 import { Button } from "@/components/Button";
 import { PublicFooter } from "@/components/PublicFooter";
 import { PublicHeader } from "@/components/PublicHeader";
@@ -28,9 +27,10 @@ export default function AboutPage() {
             </h1>
             <p className="mt-6 text-lg text-ink-muted max-w-2xl leading-relaxed">
               Gjej Pro lindi nga një ide e thjeshtë: të gjithë meritojnë qasje
-              të lehtë te mjeshtra të besueshëm. Sot lidhim mijëra familje
-              shqiptare me profesionistët e duhur — pa stres, pa angazhime të
-              fshehura.
+              të lehtë te mjeshtra të besueshëm. Po ndërtojmë një platformë
+              që lidh familjet shqiptare me profesionistët e duhur, pa stres
+              dhe pa angazhime të fshehura. Falas për të gjithë shqiptarët,
+              kudo që janë, në gjithë globin.
             </p>
           </div>
         </section>
@@ -48,7 +48,7 @@ export default function AboutPage() {
             <h2 className="font-display text-3xl text-ink">Vizioni ynë</h2>
             <p className="mt-4 text-ink-muted leading-relaxed">
               Të jemi platforma më e besueshme në Shqipëri për shërbimet në
-              shtëpi e biznes — dhe pastaj ta zgjerojmë këtë model në të gjithë
+              shtëpi e biznes, dhe pastaj ta zgjerojmë këtë model në të gjithë
               rajonin, duke filluar nga Mbretëria e Bashkuar.
             </p>
           </div>
@@ -60,11 +60,11 @@ export default function AboutPage() {
             <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-6">
               <Value
                 title="Transparencë"
-                body="Pa komisione të fshehura. Çmimi që paguani është çmimi që ofron profesionisti — pikë."
+                body="Pa komisione të fshehura. Çmimi që paguani është çmimi që ofron profesionisti."
               />
               <Value
                 title="Besueshmëri"
-                body="Çdo profesionist verifikohet para se të lejohet të dorëzojë oferta. Identitet, kompani, dokumente — gjithçka kontrollohet."
+                body="Çdo profesionist verifikohet para se të lejohet të dorëzojë oferta. Identitet, kompani, dokumente: gjithçka kontrollohet."
               />
               <Value
                 title="Cilësi"
@@ -72,33 +72,19 @@ export default function AboutPage() {
               />
               <Value
                 title="Komuniteti"
-                body="Ne nuk jemi thjesht një teknologji — jemi pjesë e komunitetit shqiptar dhe punojmë çdo ditë për ta bërë atë më të mirë."
+                body="Ne nuk jemi thjesht një teknologji. Jemi pjesë e komunitetit shqiptar dhe punojmë çdo ditë për ta bërë atë më të mirë."
               />
             </div>
           </div>
         </section>
 
-        <section className="max-w-4xl mx-auto px-6 sm:px-8 py-16">
-          <h2 className="font-display text-3xl text-ink">Ekipi</h2>
-          <p className="mt-3 text-ink-muted max-w-2xl">
-            Një ekip i vogël me një ambicie të madhe — të ndërtojmë infrastrukturën
-            e shërbimeve për rajonin.
-          </p>
-          <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <TeamCard name="Arlinda Prenci" role="Founder & CEO" />
-            <TeamCard name="Ekipi i Inxhinierisë" role="Engineering" />
-            <TeamCard name="Ekipi i Operacionit" role="Operations" />
-            <TeamCard name="Ekipi i Suportit" role="Customer Success" />
-          </div>
-        </section>
-
-        <section className="max-w-4xl mx-auto px-6 sm:px-8 pb-20">
+        <section className="max-w-4xl mx-auto px-6 sm:px-8 pb-20 pt-16">
           <div className="card p-8 sm:p-10 text-center">
             <h2 className="font-display text-3xl text-ink">
               Bëhuni pjesë e Gjej Pro
             </h2>
             <p className="mt-3 text-ink-muted max-w-xl mx-auto">
-              Si klient apo si profesionist — krijoni llogarinë tuaj në pak
+              Si klient apo si profesionist, krijoni llogarinë tuaj në pak
               minuta dhe filloni.
             </p>
             <div className="mt-6 flex flex-wrap justify-center gap-2">
@@ -126,18 +112,6 @@ function Value({ title, body }: { title: string; body: string }) {
     <div>
       <h3 className="font-display text-xl text-ink">{title}</h3>
       <p className="mt-2 text-sm text-ink-muted leading-relaxed">{body}</p>
-    </div>
-  );
-}
-
-function TeamCard({ name, role }: { name: string; role: string }) {
-  return (
-    <div className="card p-5 text-center">
-      <Avatar name={name} size={56} className="mx-auto" />
-      <div className="mt-3 font-medium text-ink">{name}</div>
-      <div className="text-xs text-stone uppercase tracking-wider mt-1">
-        {role}
-      </div>
     </div>
   );
 }
