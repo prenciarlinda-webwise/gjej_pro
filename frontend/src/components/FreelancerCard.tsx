@@ -1,0 +1,85 @@
+import Link from "next/link";
+import { Avatar } from "@/components/Avatar";
+import type { FreelancerListItem } from "@/lib/api";
+
+export function FreelancerCard({ f }: { f: FreelancerListItem }) {
+  const rate =
+    f.hourly_rate_min || f.hourly_rate_max
+      ? `${f.hourly_rate_min ?? "?"}–${f.hourly_rate_max ?? "?"} ${f.currency}`
+      : "Me ofertë";
+  const ratePer = f.hourly_rate_min || f.hourly_rate_max ? " / orë" : "";
+
+  return (
+    <Link
+      href={`/profesionist/${f.id}`}
+      className="card card-link block p-5"
+    >
+      <div className="flex items-start gap-3">
+        <Avatar name={f.full_name} src={f.avatar_url || null} size={48} />
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-2 flex-wrap">
+            <h3 className="font-display text-lg text-ink truncate">
+              {f.full_name}
+            </h3>
+            {f.is_verified && (
+              <span
+                className="text-[10px] uppercase tracking-wider text-gold-deep border border-gold/40 bg-gold/10 rounded-full px-2 py-0.5"
+                title="I verifikuar"
+              >
+                ✓ Verifikuar
+              </span>
+            )}
+          </div>
+          {f.headline && (
+            <p className="mt-0.5 text-sm text-ink-muted line-clamp-1">
+              {f.headline}
+            </p>
+          )}
+        </div>
+      </div>
+
+      {f.categories.length > 0 && (
+        <div className="mt-4 flex flex-wrap gap-1.5">
+          {f.categories.slice(0, 3).map((c) => (
+            <span
+              key={c.id}
+              className="text-[11px] text-ink-muted bg-surface-2 border border-line rounded-full px-2.5 py-0.5"
+            >
+              {c.name}
+            </span>
+          ))}
+        </div>
+      )}
+
+      <div className="mt-5 pt-4 border-t border-line/70 flex items-end justify-between gap-3">
+        <div>
+          <div className="text-base font-medium text-ink numeric">
+            {rate}
+            <span className="text-stone text-xs font-normal">{ratePer}</span>
+          </div>
+          {f.cities.length > 0 && (
+            <div className="mt-0.5 text-xs text-stone truncate max-w-[160px]">
+              {f.cities.slice(0, 2).join(" · ")}
+              {f.cities.length > 2 && ` +${f.cities.length - 2}`}
+            </div>
+          )}
+        </div>
+
+        {Number(f.review_count) > 0 ? (
+          <div className="text-right">
+            <div className="text-sm font-medium text-ink numeric">
+              ★ {f.avg_rating}
+            </div>
+            <div className="text-[10px] uppercase tracking-wider text-stone numeric">
+              {f.review_count} {f.review_count === 1 ? "vlerësim" : "vlerësime"}
+            </div>
+          </div>
+        ) : (
+          <div className="text-[10px] uppercase tracking-wider text-stone">
+            I ri
+          </div>
+        )}
+      </div>
+    </Link>
+  );
+}

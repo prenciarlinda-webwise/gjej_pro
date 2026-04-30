@@ -1,0 +1,116 @@
+@import "tailwindcss";
+
+:root {
+  /* Brand palette — cool digital neutrals + forest green brand + warm gold
+   * accent reserved for verified/featured states.
+   */
+  --color-ink: #0B1014;
+  --color-ink-muted: #3A4148;
+  --color-stone: #606870;
+
+  --color-forest: #1F4D3A;
+  --color-forest-deep: #143527;
+  --color-emerald: #2E7D5B;
+
+  --color-bg: #F6F8FA;
+  --color-surface: #FFFFFF;
+  --color-surface-2: #EDF1F4;
+
+  --color-line: #DDE2E6;
+  --color-line-strong: #C2C9CF;
+
+  --color-gold: #C9A961;
+  --color-gold-deep: #A88847;
+  --color-danger: #B23A2E;
+  --color-success: #2E7D5B;
+
+  /* Layered shadows — used instead of grid lines for visual hierarchy */
+  --shadow-sm: 0 1px 2px rgba(11, 16, 20, 0.04);
+  --shadow-md: 0 4px 16px rgba(11, 16, 20, 0.06);
+  --shadow-lg: 0 12px 40px rgba(11, 16, 20, 0.08);
+  --shadow-xl: 0 24px 60px rgba(11, 16, 20, 0.10);
+}
+
+@theme inline {
+  --color-ink: var(--color-ink);
+  --color-ink-muted: var(--color-ink-muted);
+  --color-stone: var(--color-stone);
+  --color-forest: var(--color-forest);
+  --color-forest-deep: var(--color-forest-deep);
+  --color-emerald: var(--color-emerald);
+  --color-bg: var(--color-bg);
+  --color-surface: var(--color-surface);
+  --color-surface-2: var(--color-surface-2);
+  --color-line: var(--color-line);
+  --color-line-strong: var(--color-line-strong);
+  --color-gold: var(--color-gold);
+  --color-gold-deep: var(--color-gold-deep);
+  --color-danger: var(--color-danger);
+  --color-success: var(--color-success);
+  --font-sans: var(--font-inter), system-ui, sans-serif;
+  --font-display: var(--font-fraunces), Georgia, serif;
+  --shadow-card: var(--shadow-md);
+  --shadow-card-hover: var(--shadow-lg);
+}
+
+html, body {
+  background: var(--color-bg);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1, h2, h3, .font-display {
+  font-family: var(--font-display);
+  font-variation-settings: "opsz" 144, "SOFT" 0, "WONK" 0;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+}
+
+.numeric, table {
+  font-variant-numeric: tabular-nums;
+}
+
+*:focus-visible {
+  outline: 2px solid var(--color-forest);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Reusable card style — softer than a bordered box, used across the public site */
+.card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-line);
+  border-radius: 16px;
+  box-shadow: var(--shadow-md);
+  transition: box-shadow 200ms ease, transform 200ms ease, border-color 200ms ease;
+}
+.card:hover {
+  box-shadow: var(--shadow-lg);
+  border-color: var(--color-line-strong);
+}
+.card-link:hover {
+  transform: translateY(-1px);
+}
+
+/* Soft section gradient backgrounds for visual richness */
+.bg-gradient-warm {
+  background:
+    radial-gradient(ellipse 80% 60% at 90% 0%, rgba(201, 169, 97, 0.08), transparent),
+    radial-gradient(ellipse 80% 60% at 0% 100%, rgba(46, 125, 91, 0.06), transparent),
+    var(--color-bg);
+}
+
+.bg-gradient-forest {
+  background:
+    linear-gradient(135deg, var(--color-forest) 0%, var(--color-forest-deep) 100%);
+}
+
+/* Marquee-style horizontal scroll — used for category rails */
+.scroll-rail {
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+}
+.scroll-rail::-webkit-scrollbar { display: none; }
+.scroll-rail > * { scroll-snap-align: start; }

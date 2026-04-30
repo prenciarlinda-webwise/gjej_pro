@@ -1,0 +1,41 @@
+# Python
+__pycache__/
+*.py[cod]
+*.so
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+
+# Django
+*.sqlite3
+db.sqlite3
+staticfiles/
+media/
+.env
+.env.local
+
+# Node / Next.js
+node_modules/
+.next/
+out/
+dist/
+.npm/
+*.tsbuildinfo
+next-env.d.ts
+
+# Editors / OS
+.idea/
+.vscode/
+.DS_Store
+*.log
+
+# Claude / agent docs
+.claude/
+CLAUDE.md
+AGENTS.md
+HANDOFF.md
+
+# Local
+.env.local
+.env.*.local
