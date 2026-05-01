@@ -11,7 +11,7 @@ export function FreelancerCard({ f }: { f: FreelancerListItem }) {
 
   return (
     <Link
-      href={`/profesionist/${f.id}`}
+      href={`/profesionist/${f.slug}`}
       className="card card-link block p-5"
     >
       <div className="flex items-start gap-3">

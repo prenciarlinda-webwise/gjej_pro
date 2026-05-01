@@ -13,6 +13,7 @@ from .models import JobRequest, Quote, Review
 class QuoteOnJobSerializer(serializers.ModelSerializer):
     """Quote as viewed by the klient looking at their job."""
     freelancer_id = serializers.IntegerField(source="freelancer.user.id", read_only=True)
+    freelancer_slug = serializers.CharField(source="freelancer.slug", read_only=True)
     freelancer_name = serializers.CharField(source="freelancer.user.full_name", read_only=True)
     freelancer_headline = serializers.CharField(source="freelancer.headline", read_only=True)
     freelancer_avg_rating = serializers.DecimalField(
@@ -31,7 +32,7 @@ class QuoteOnJobSerializer(serializers.ModelSerializer):
         fields = (
             "id", "price", "currency", "message", "status", "status_label",
             "created_at",
-            "freelancer_id", "freelancer_name", "freelancer_headline",
+            "freelancer_id", "freelancer_slug", "freelancer_name", "freelancer_headline",
             "freelancer_avg_rating", "freelancer_review_count",
             "freelancer_is_verified",
         )

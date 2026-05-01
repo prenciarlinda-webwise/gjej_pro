@@ -35,6 +35,7 @@ next-env.d.ts
 CLAUDE.md
 AGENTS.md
 HANDOFF.md
+POSTGIS_SETUP.md
 
 # Local
 .env.local

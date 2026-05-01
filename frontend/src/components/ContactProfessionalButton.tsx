@@ -6,15 +6,17 @@ import { Button } from "@/components/Button";
 
 export function ContactProfessionalButton({
   freelancerUserId,
+  freelancerSlug,
 }: {
   freelancerUserId: number;
+  freelancerSlug: string;
 }) {
   const router = useRouter();
   const { user } = useAuth();
 
   function start() {
     if (!user) {
-      router.push(`/hyr?next=/profesionist/${freelancerUserId}`);
+      router.push(`/hyr?next=/profesionist/${freelancerSlug}`);
       return;
     }
     if (user.role !== "klient") {

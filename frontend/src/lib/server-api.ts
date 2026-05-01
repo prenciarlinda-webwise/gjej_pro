@@ -71,17 +71,27 @@ export const serverApi = {
     q?: string;
     category?: string;
     city?: string;
+    slug?: string;
     page?: number;
   } = {}) => {
     const sp = new URLSearchParams();
     if (params.q) sp.set("q", params.q);
     if (params.category) sp.set("category", params.category);
     if (params.city) sp.set("city", params.city);
+    if (params.slug) sp.set("slug", params.slug);
     if (params.page) sp.set("page", String(params.page));
     const qs = sp.toString();
     return ssrFetch<PaginatedResponse<FreelancerListItem>>(
       `/freelancers/${qs ? `?${qs}` : ""}`,
     );
+  },
+
+  /** Resolve a public slug to the underlying numeric user_id. */
+  resolveFreelancerSlug: async (slug: string): Promise<number | null> => {
+    const res = await ssrFetch<PaginatedResponse<FreelancerListItem>>(
+      `/freelancers/?slug=${encodeURIComponent(slug)}`,
+    );
+    return res?.results?.[0]?.id ?? null;
   },
 
   freelancer: (id: number) =>

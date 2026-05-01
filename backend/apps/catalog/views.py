@@ -135,6 +135,10 @@ class FreelancerListView(ListAPIView):
 
         params = self.request.query_params
 
+        slug = (params.get("slug") or "").strip()
+        if slug:
+            qs = qs.filter(slug=slug)
+
         q = (params.get("q") or "").strip()
         if q:
             qs = qs.filter(
@@ -152,7 +156,10 @@ class FreelancerListView(ListAPIView):
 
         city = (params.get("city") or "").strip()
         if city:
-            qs = qs.filter(service_areas__city__iexact=city).distinct()
+            from .cities import canonical_city
+            qs = qs.filter(
+                service_areas__city__iexact=canonical_city(city),
+            ).distinct()
 
         # Geo "near me" filter — accepts ?lat=&lng=&radius_km=
         lat = params.get("lat")
@@ -174,7 +181,7 @@ class FreelancerListView(ListAPIView):
 
 
 class FreelancerDetailView(RetrieveAPIView):
-    """Public profile by user id (the underlying User.id)."""
+    """Public profile by underlying User.id (numeric, canonical)."""
 
     permission_classes = (permissions.AllowAny,)
     serializer_class = FreelancerDetailSerializer

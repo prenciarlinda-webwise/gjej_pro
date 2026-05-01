@@ -48,3 +48,44 @@ def lookup_city(name: str) -> Optional[tuple[float, float]]:
     if not name:
         return None
     return ALBANIAN_CITY_COORDS.get(name.strip().lower())
+
+
+# Slug (ASCII, no diacritics) → canonical Albanian city name (with diacritics).
+# Used to translate URL slugs back to the city name stored in service_areas.
+SLUG_TO_CITY: dict[str, str] = {
+    "tirane":       "Tiranë",
+    "durres":       "Durrës",
+    "vlore":        "Vlorë",
+    "elbasan":      "Elbasan",
+    "shkoder":      "Shkodër",
+    "fier":         "Fier",
+    "korce":        "Korçë",
+    "berat":        "Berat",
+    "lushnje":      "Lushnjë",
+    "pogradec":     "Pogradec",
+    "kavaje":       "Kavajë",
+    "lezhe":        "Lezhë",
+    "sarande":      "Sarandë",
+    "kukes":        "Kukës",
+    "gjirokaster":  "Gjirokastër",
+    "patos":        "Patos",
+    "kruje":        "Krujë",
+    "kucove":       "Kuçovë",
+}
+
+
+def canonical_city(name_or_slug: str) -> str:
+    """Best-effort: return the canonical (with-diacritics) Albanian city name.
+
+    Accepts either the full name (already with or without diacritics) or a slug.
+    Falls back to the input unchanged if no mapping exists.
+    """
+    if not name_or_slug:
+        return ""
+    raw = name_or_slug.strip()
+    if raw in SLUG_TO_CITY:
+        return SLUG_TO_CITY[raw]
+    lower = raw.lower()
+    if lower in SLUG_TO_CITY:
+        return SLUG_TO_CITY[lower]
+    return raw

@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import {
   api,
   type Category,
@@ -15,9 +16,16 @@ import { Button } from "@/components/Button";
 import { HeroDecoration } from "@/components/HeroDecoration";
 import { MapView, type MapPin } from "@/components/MapView";
 
-const ALBANIAN_CITIES = [
-  "Tiranë", "Durrës", "Vlorë", "Elbasan", "Shkodër",
-  "Fier", "Korçë", "Berat", "Sarandë",
+const ALBANIAN_CITIES: { slug: string; name: string }[] = [
+  { slug: "tirane", name: "Tiranë" },
+  { slug: "durres", name: "Durrës" },
+  { slug: "vlore", name: "Vlorë" },
+  { slug: "elbasan", name: "Elbasan" },
+  { slug: "shkoder", name: "Shkodër" },
+  { slug: "fier", name: "Fier" },
+  { slug: "korce", name: "Korçë" },
+  { slug: "berat", name: "Berat" },
+  { slug: "sarande", name: "Sarandë" },
 ];
 
 interface Coords {
@@ -26,17 +34,29 @@ interface Coords {
 }
 
 export default function FreelancerBrowsePage() {
+  return (
+    <Suspense fallback={null}>
+      <FreelancerBrowse />
+    </Suspense>
+  );
+}
+
+function FreelancerBrowse() {
+  const router = useRouter();
+  const pathname = usePathname();
+  const sp = useSearchParams();
+
   const [categories, setCategories] = useState<Category[]>([]);
   const [results, setResults] = useState<PaginatedResponse<FreelancerListItem> | null>(null);
-  const [q, setQ] = useState("");
-  const [category, setCategory] = useState<string>("");
-  const [city, setCity] = useState<string>("");
-  const [verified, setVerified] = useState(false);
+  const [q, setQ] = useState<string>(() => sp.get("q") ?? "");
+  const [category, setCategory] = useState<string>(() => sp.get("category") ?? "");
+  const [city, setCity] = useState<string>(() => sp.get("city") ?? "");
+  const [verified, setVerified] = useState<boolean>(() => sp.get("verified") === "1");
   const [coords, setCoords] = useState<Coords | null>(null);
   const [coordsError, setCoordsError] = useState<string>("");
   const [requestingLocation, setRequestingLocation] = useState(false);
   const [radiusKm, setRadiusKm] = useState(25);
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState<number>(() => Math.max(1, Number(sp.get("page") || 1)));
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -59,6 +79,18 @@ export default function FreelancerBrowsePage() {
       .then((r) => setResults(r))
       .finally(() => setLoading(false));
   }, [q, category, city, verified, coords, radiusKm, page]);
+
+  // Keep the URL in sync with the active filters so the page is shareable.
+  useEffect(() => {
+    const params = new URLSearchParams();
+    if (q) params.set("q", q);
+    if (category) params.set("category", category);
+    if (city) params.set("city", city);
+    if (verified) params.set("verified", "1");
+    if (page > 1) params.set("page", String(page));
+    const qs = params.toString();
+    router.replace(`${pathname}${qs ? "?" + qs : ""}`, { scroll: false });
+  }, [q, category, city, verified, page, router, pathname]);
 
   function clearFilters() {
     setQ("");
@@ -223,7 +255,7 @@ export default function FreelancerBrowsePage() {
               >
                 <option value="">Të gjitha</option>
                 {ALBANIAN_CITIES.map((c) => (
-                  <option key={c} value={c}>{c}</option>
+                  <option key={c.slug} value={c.slug}>{c.name}</option>
                 ))}
               </select>
             </FilterGroup>

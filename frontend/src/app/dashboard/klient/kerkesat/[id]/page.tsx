@@ -325,7 +325,7 @@ function QuoteCard({
         <div className="min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
             <Link
-              href={`/profesionist/${quote.freelancer_id}`}
+              href={`/profesionist/${quote.freelancer_slug}`}
               className="font-medium text-ink hover:underline"
             >
               {quote.freelancer_name}
@@ -379,7 +379,7 @@ function QuoteCard({
             Mesazh
           </Button>
         </Link>
-        <Link href={`/profesionist/${quote.freelancer_id}`}>
+        <Link href={`/profesionist/${quote.freelancer_slug}`}>
           <Button variant="ghost" size="sm">Shih profilin</Button>
         </Link>
       </div>

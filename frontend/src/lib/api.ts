@@ -99,6 +99,7 @@ export interface ServiceArea {
 
 export interface FreelancerListItem {
   id: number;
+  slug: string;
   full_name: string;
   headline: string;
   company_name: string;
@@ -161,6 +162,7 @@ export interface QuoteOnJob {
   status_label: string;
   created_at: string;
   freelancer_id: number;
+  freelancer_slug: string;
   freelancer_name: string;
   freelancer_headline: string;
   freelancer_avg_rating: string;
@@ -286,6 +288,7 @@ export interface NotificationItem {
 
 export interface MessagePeer {
   id: number;
+  slug: string;
   full_name: string;
   role: Role;
   headline: string;
@@ -591,12 +594,12 @@ export const api = {
       method: "POST",
       body: JSON.stringify(body),
     }),
-  freelancerReviews: (userId: number, page = 1) => {
+  freelancerReviews: (id: number, page = 1) => {
     const sp = new URLSearchParams();
     if (page > 1) sp.set("page", String(page));
     const qs = sp.toString();
     return rawFetch<PaginatedResponse<ReviewItem>>(
-      `/freelancers/${userId}/reviews/${qs ? `?${qs}` : ""}`,
+      `/freelancers/${id}/reviews/${qs ? `?${qs}` : ""}`,
       { auth: false },
     );
   },

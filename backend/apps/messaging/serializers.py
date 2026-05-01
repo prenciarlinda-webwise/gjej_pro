@@ -19,8 +19,17 @@ class _PeerSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     full_name = serializers.CharField()
     role = serializers.CharField()
+    slug = serializers.SerializerMethodField()
     headline = serializers.SerializerMethodField()
     avatar_url = serializers.SerializerMethodField()
+
+    def get_slug(self, obj: User) -> str:
+        try:
+            if obj.role == User.Role.FREELANCER:
+                return obj.freelancer_profile.slug or ""
+        except Exception:
+            return ""
+        return ""
 
     def get_headline(self, obj: User) -> str:
         try:

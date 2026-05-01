@@ -46,7 +46,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const freelancersList = await serverApi.searchFreelancers({ page: 1 });
   const freelancerEntries: MetadataRoute.Sitemap =
     (freelancersList?.results ?? []).map((f) => ({
-      url: `${SITE.url}/profesionist/${f.id}`,
+      url: `${SITE.url}/profesionist/${f.slug}`,
       lastModified: now,
       changeFrequency: "weekly",
       priority: 0.6,

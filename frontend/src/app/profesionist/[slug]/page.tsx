@@ -8,15 +8,20 @@ import { ReadOnlyStars } from "@/components/StarRating";
 import { serverApi, SITE } from "@/lib/server-api";
 
 interface RouteParams {
-  params: Promise<{ id: string }>;
+  params: Promise<{ slug: string }>;
 }
 
 export async function generateMetadata({ params }: RouteParams): Promise<Metadata> {
-  const { id } = await params;
-  const profile = await serverApi.freelancer(Number(id));
+  const { slug } = await params;
+  const userId = await serverApi.resolveFreelancerSlug(slug);
+  if (!userId) {
+    return { title: `Profesionisti nuk u gjet | ${SITE.name}` };
+  }
+  const profile = await serverApi.freelancer(userId);
   if (!profile) {
     return { title: `Profesionisti nuk u gjet | ${SITE.name}` };
   }
+  const canonical = `${SITE.url}/profesionist/${profile.slug}`;
   const cats = profile.categories.map((c) => c.name).join(", ");
   const title = `${profile.full_name}${profile.headline ? " | " + profile.headline : ""} | ${SITE.name}`;
   const description =
@@ -26,11 +31,11 @@ export async function generateMetadata({ params }: RouteParams): Promise<Metadat
   return {
     title,
     description,
-    alternates: { canonical: `${SITE.url}/profesionist/${id}` },
+    alternates: { canonical },
     openGraph: {
       title,
       description,
-      url: `${SITE.url}/profesionist/${id}`,
+      url: canonical,
       siteName: SITE.name,
       locale: "sq_AL",
       type: "profile",
@@ -40,8 +45,11 @@ export async function generateMetadata({ params }: RouteParams): Promise<Metadat
 }
 
 export default async function FreelancerDetailPage({ params }: RouteParams) {
-  const { id } = await params;
-  const userId = Number(id);
+  const { slug } = await params;
+  const userId = await serverApi.resolveFreelancerSlug(slug);
+  if (!userId) {
+    notFound();
+  }
   const [profile, reviews] = await Promise.all([
     serverApi.freelancer(userId),
     serverApi.freelancerReviews(userId),
@@ -116,7 +124,10 @@ export default async function FreelancerDetailPage({ params }: RouteParams) {
             </div>
 
             <div className="mt-6">
-              <ContactProfessionalButton freelancerUserId={userId} />
+              <ContactProfessionalButton
+                freelancerUserId={userId}
+                freelancerSlug={profile.slug}
+              />
             </div>
           </div>
         </section>

@@ -97,6 +97,7 @@ def _avatar_url(context, avatar) -> str:
 class FreelancerListItemSerializer(serializers.Serializer):
     """Compact representation for the search results grid."""
     id = serializers.IntegerField(source="user.id")
+    slug = serializers.CharField()
     full_name = serializers.CharField(source="user.full_name")
     headline = serializers.CharField()
     company_name = serializers.SerializerMethodField()
@@ -131,6 +132,7 @@ class FreelancerListItemSerializer(serializers.Serializer):
 class FreelancerDetailSerializer(serializers.Serializer):
     """Full public profile — intentionally omits email/phone/private contact."""
     id = serializers.IntegerField(source="user.id")
+    slug = serializers.CharField()
     full_name = serializers.CharField(source="user.full_name")
     headline = serializers.CharField()
     bio = serializers.CharField()
@@ -143,6 +145,8 @@ class FreelancerDetailSerializer(serializers.Serializer):
     review_count = serializers.IntegerField()
     is_verified = serializers.BooleanField()
     avatar_url = serializers.SerializerMethodField()
+    categories = serializers.SerializerMethodField()
+    cities = serializers.SerializerMethodField()
     services = ServiceReadSerializer(many=True)
     service_areas = ServiceAreaSerializer(many=True)
     member_since = serializers.DateTimeField(source="user.date_joined")
@@ -152,3 +156,13 @@ class FreelancerDetailSerializer(serializers.Serializer):
 
     def get_avatar_url(self, obj) -> str:
         return _avatar_url(self.context, obj.avatar)
+
+    def get_categories(self, obj) -> list[dict]:
+        seen: dict[int, dict] = {}
+        for s in obj.services.filter(is_active=True).select_related("category"):
+            c = s.category
+            seen.setdefault(c.id, {"id": c.id, "name": c.name, "slug": c.slug})
+        return list(seen.values())
+
+    def get_cities(self, obj) -> list[str]:
+        return list(obj.service_areas.values_list("city", flat=True).distinct())

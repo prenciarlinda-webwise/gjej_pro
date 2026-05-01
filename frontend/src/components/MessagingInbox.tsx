@@ -237,7 +237,7 @@ function ActiveThread({
           <Link
             href={
               conv.peer.role === "freelancer"
-                ? `/profesionist/${conv.peer.id}`
+                ? `/profesionist/${conv.peer.slug}`
                 : "#"
             }
             className="font-medium text-ink hover:underline truncate block"
