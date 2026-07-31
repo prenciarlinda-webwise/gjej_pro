@@ -154,12 +154,20 @@ class FreelancerListView(ListAPIView):
         if category:
             qs = qs.filter(services__category__slug=category, services__is_active=True).distinct()
 
+        # country + city must be filtered in a single service_areas__ lookup
+        # so both conditions match the *same* ServiceArea row — a freelancer
+        # serving both Tiranë (AL) and New York (US) must not match
+        # country=US + city=Tiranë from two different rows.
+        country = (params.get("country") or "").strip().upper()
         city = (params.get("city") or "").strip()
+        area_filter = {}
+        if country:
+            area_filter["service_areas__country"] = country
         if city:
             from .cities import canonical_city
-            qs = qs.filter(
-                service_areas__city__iexact=canonical_city(city),
-            ).distinct()
+            area_filter["service_areas__city__iexact"] = canonical_city(city)
+        if area_filter:
+            qs = qs.filter(**area_filter).distinct()
 
         # Geo "near me" filter — accepts ?lat=&lng=&radius_km=
         lat = params.get("lat")

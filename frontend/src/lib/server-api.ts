@@ -71,6 +71,7 @@ export const serverApi = {
     q?: string;
     category?: string;
     city?: string;
+    country?: string;
     slug?: string;
     page?: number;
     page_size?: number;
@@ -79,6 +80,7 @@ export const serverApi = {
     if (params.q) sp.set("q", params.q);
     if (params.category) sp.set("category", params.category);
     if (params.city) sp.set("city", params.city);
+    if (params.country) sp.set("country", params.country);
     if (params.slug) sp.set("slug", params.slug);
     if (params.page) sp.set("page", String(params.page));
     if (params.page_size) sp.set("page_size", String(params.page_size));
@@ -89,11 +91,14 @@ export const serverApi = {
   },
 
   /** Walks `next` pages (each at max page_size) up to `cap` items — used by the sitemap. */
-  allFreelancers: async (cap = 300): Promise<FreelancerListItem[]> => {
+  allFreelancers: async (
+    cap = 300,
+    country?: string,
+  ): Promise<FreelancerListItem[]> => {
     const out: FreelancerListItem[] = [];
     let page = 1;
     while (out.length < cap) {
-      const res = await serverApi.searchFreelancers({ page, page_size: 60 });
+      const res = await serverApi.searchFreelancers({ page, page_size: 60, country });
       if (!res || res.results.length === 0) break;
       out.push(...res.results);
       if (!res.next) break;
@@ -198,6 +203,24 @@ export const COUNTRY_LOCALES: Array<{
   live: boolean;
 }> = [
   { locale: "sq-AL", path: "", label: "Shqipëri", live: true },
-  { locale: "sq-GB", path: "/uk", label: "Mbretëria e Bashkuar", live: false },
-  { locale: "sq-US", path: "/us", label: "Shtetet e Bashkuara", live: false },
+  { locale: "sq-GB", path: "/uk", label: "Mbretëria e Bashkuar", live: true },
+  { locale: "sq-US", path: "/us", label: "Shtetet e Bashkuara", live: true },
 ];
+
+/**
+ * Builds `alternates.languages` for a page that exists in every live
+ * country section at the same logical path — e.g. suffix "/elektricist"
+ * covers "/elektricist", "/uk/elektricist", "/us/elektricist". Only call
+ * this for paths that actually exist in every section (hub pages, category
+ * pages, city pages); don't call it for AL-only pages like /blog.
+ */
+export function hreflangAlternates(suffix: string): Record<string, string> {
+  const languages: Record<string, string> = {};
+  for (const loc of COUNTRY_LOCALES) {
+    if (!loc.live) continue;
+    languages[loc.locale] = `${SITE.url}${loc.path}${suffix}`;
+  }
+  const albania = COUNTRY_LOCALES.find((l) => l.locale === "sq-AL");
+  languages["x-default"] = `${SITE.url}${albania?.path ?? ""}${suffix}`;
+  return languages;
+}

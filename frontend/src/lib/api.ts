@@ -534,6 +534,7 @@ export const api = {
     q?: string;
     category?: string;
     city?: string;
+    country?: string;
     verified?: boolean;
     lat?: number;
     lng?: number;
@@ -544,6 +545,7 @@ export const api = {
     if (params.q) sp.set("q", params.q);
     if (params.category) sp.set("category", params.category);
     if (params.city) sp.set("city", params.city);
+    if (params.country) sp.set("country", params.country);
     if (params.verified) sp.set("verified", "1");
     if (params.lat !== undefined && params.lng !== undefined) {
       sp.set("lat", String(params.lat));

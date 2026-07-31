@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Logo } from "@/components/Logo";
 import { ALBANIAN_CITIES } from "@/lib/server-api";
+import { COUNTRIES } from "@/lib/countries";
 
 const TOP_CATEGORIES = [
   { slug: "elektricist", name: "Elektricist" },
@@ -112,7 +113,16 @@ export function PublicFooter() {
       <div className="border-t border-line">
         <div className="max-w-6xl mx-auto px-6 sm:px-8 py-5 flex flex-wrap items-center justify-between gap-3 text-xs text-stone">
           <p>© {year} Gjej Pro · Profesionistë për ju</p>
-          <p>Shqipëria · Albania</p>
+          <nav className="flex items-center gap-3">
+            <Link href="/" className="hover:text-ink">
+              Shqipëri
+            </Link>
+            {Object.values(COUNTRIES).map((c) => (
+              <Link key={c.code} href={c.pathPrefix} className="hover:text-ink">
+                {c.label}
+              </Link>
+            ))}
+          </nav>
         </div>
       </div>
     </footer>

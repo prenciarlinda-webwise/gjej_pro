@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   title: `Blog | ${SITE.name}`,
   description:
     "Këshilla, udhëzues dhe histori nga komuniteti i Gjej Pro, për klientët dhe profesionistët.",
-  alternates: { canonical: `${SITE.url}/blog` },
+  alternates: { canonical: `${SITE.url}/blog`, types: { "application/rss+xml": `${SITE.url}/blog/rss.xml` } },
 };
 
 export default async function BlogIndexPage() {

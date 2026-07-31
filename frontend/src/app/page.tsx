@@ -7,12 +7,12 @@ import { CategoryIcon } from "@/components/CategoryIcon";
 import { Avatar } from "@/components/Avatar";
 import { Button } from "@/components/Button";
 import { ReadOnlyStars } from "@/components/StarRating";
-import { serverApi, SITE } from "@/lib/server-api";
+import { serverApi, SITE, hreflangAlternates } from "@/lib/server-api";
 
 export const metadata: Metadata = {
   title: `${SITE.name} | Profesionistë të verifikuar në Shqipëri`,
   description: SITE.description,
-  alternates: { canonical: SITE.url },
+  alternates: { canonical: SITE.url, languages: hreflangAlternates("") },
   openGraph: {
     title: `${SITE.name} | Profesionistë për ju`,
     description: SITE.description,

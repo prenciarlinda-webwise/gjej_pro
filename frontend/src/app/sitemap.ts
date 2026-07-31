@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { ALBANIAN_CITIES, serverApi, SITE } from "@/lib/server-api";
+import { COUNTRIES } from "@/lib/countries";
 
 const STATIC_PATHS = [
   "/",
@@ -14,6 +15,13 @@ const STATIC_PATHS = [
   "/hyr",
   "/regjistrohu",
 ];
+
+// Country hub + city-index pages are always real, unique content —
+// included unconditionally. Country category/city *detail* pages are only
+// included once real freelancer supply exists there (they're `noindex`
+// until then, see CategoryCountryView/CityCountryView) — derived below
+// from actual freelancer data instead of guessed/hardcoded.
+const COUNTRY_STATIC_SUFFIXES = ["", "/qytete"];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
@@ -61,11 +69,51 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.5,
   }));
 
+  // Country sections (US/UK diaspora expansion).
+  const countryEntries: MetadataRoute.Sitemap = [];
+  for (const country of Object.values(COUNTRIES)) {
+    for (const suffix of COUNTRY_STATIC_SUFFIXES) {
+      countryEntries.push({
+        url: `${SITE.url}${country.pathPrefix}${suffix}`,
+        lastModified: now,
+        changeFrequency: "weekly",
+        priority: suffix === "" ? 0.8 : 0.6,
+      });
+    }
+
+    const countryFreelancers = await serverApi.allFreelancers(300, country.apiCountry);
+    const categorySlugsWithSupply = new Set(
+      countryFreelancers.flatMap((f) => f.categories.map((c) => c.slug)),
+    );
+    for (const slug of categorySlugsWithSupply) {
+      countryEntries.push({
+        url: `${SITE.url}${country.pathPrefix}/${slug}`,
+        lastModified: now,
+        changeFrequency: "weekly",
+        priority: 0.6,
+      });
+    }
+
+    const citiesWithSupply = new Set(
+      countryFreelancers.flatMap((f) => f.cities.map((c) => c.toLowerCase())),
+    );
+    for (const city of country.cities) {
+      if (!citiesWithSupply.has(city.name.toLowerCase())) continue;
+      countryEntries.push({
+        url: `${SITE.url}${country.pathPrefix}/qytete/${city.slug}`,
+        lastModified: now,
+        changeFrequency: "weekly",
+        priority: 0.6,
+      });
+    }
+  }
+
   return [
     ...staticEntries,
     ...categoryEntries,
     ...cityEntries,
     ...freelancerEntries,
     ...postEntries,
+    ...countryEntries,
   ];
 }

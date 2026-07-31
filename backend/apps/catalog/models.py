@@ -15,7 +15,8 @@ RESERVED_SLUGS = frozenset({
     "admin", "api", "blog", "dashboard", "hyr", "kategorite", "mesazhet",
     "njoftimet", "per-profesionistet", "profesionist", "profesionistet",
     "pyetjet-e-shpeshta", "qytete", "regjistrohu", "rreth-nesh", "si-funksionon",
-    "sitemap.xml", "robots.txt", "verifiko-emailin",
+    "sitemap.xml", "robots.txt", "verifiko-emailin", "llms.txt",
+    "us", "uk",
 })
 
 

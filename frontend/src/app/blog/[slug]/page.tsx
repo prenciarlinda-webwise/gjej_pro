@@ -3,6 +3,9 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PublicFooter } from "@/components/PublicFooter";
 import { PublicHeader } from "@/components/PublicHeader";
+import { JsonLd } from "@/components/JsonLd";
+import { blogPostingSchema, breadcrumbSchema } from "@/lib/structured-data";
+import { MarkdownContent } from "@/components/MarkdownContent";
 import { serverApi, SITE } from "@/lib/server-api";
 
 interface RouteParams {
@@ -37,6 +40,16 @@ export default async function BlogPostPage({ params }: RouteParams) {
 
   return (
     <>
+      <JsonLd
+        data={[
+          blogPostingSchema(post),
+          breadcrumbSchema([
+            { name: "Kreu", url: SITE.url },
+            { name: "Blog", url: `${SITE.url}/blog` },
+            { name: post.title, url: `${SITE.url}/blog/${post.slug}` },
+          ]),
+        ]}
+      />
       <PublicHeader />
       <main className="flex-1">
         <article className="max-w-3xl mx-auto px-6 sm:px-8 py-12">
@@ -73,11 +86,7 @@ export default async function BlogPostPage({ params }: RouteParams) {
           )}
 
           <div className="mt-10 prose-content text-ink leading-relaxed">
-            {post.body.split(/\n\n+/).map((para, i) => (
-              <p key={i} className="mb-5 whitespace-pre-line">
-                {para}
-              </p>
-            ))}
+            <MarkdownContent body={post.body} />
           </div>
         </article>
       </main>

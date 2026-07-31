@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { api, ApiError, type ServiceArea } from "@/lib/api";
 import { Button } from "@/components/Button";
 import { Field } from "@/components/Field";
+import { US_CITIES, UK_CITIES } from "@/lib/countries";
 
 const ALBANIAN_CITIES = [
   "Tiranë", "Durrës", "Vlorë", "Elbasan", "Shkodër", "Fier", "Korçë",
@@ -11,9 +12,20 @@ const ALBANIAN_CITIES = [
   "Gjirokastër", "Patos", "Krujë", "Kuçovë",
 ];
 
+const COUNTRY_OPTIONS: Array<{ code: string; label: string; quickCities: string[] }> = [
+  { code: "AL", label: "Shqipëri", quickCities: ALBANIAN_CITIES },
+  { code: "US", label: "SHBA", quickCities: US_CITIES.map((c) => c.name) },
+  { code: "GB", label: "Mbretëria e Bashkuar", quickCities: UK_CITIES.map((c) => c.name) },
+];
+
+function countryLabel(code: string): string {
+  return COUNTRY_OPTIONS.find((c) => c.code === code)?.label ?? code;
+}
+
 export default function FreelancerAreasPage() {
   const [areas, setAreas] = useState<ServiceArea[]>([]);
   const [loading, setLoading] = useState(true);
+  const [country, setCountry] = useState("AL");
   const [city, setCity] = useState("");
   const [region, setRegion] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -37,6 +49,7 @@ export default function FreelancerAreasPage() {
       await api.createServiceArea({
         city: city.trim(),
         region: region.trim(),
+        country,
       });
       setCity("");
       setRegion("");
@@ -60,7 +73,9 @@ export default function FreelancerAreasPage() {
 
   if (loading) return <div className="text-stone">Po ngarkohet…</div>;
 
-  const existingCities = new Set(areas.map((a) => a.city));
+  const existingAreaKeys = new Set(areas.map((a) => `${a.country}:${a.city}`));
+  const quickCities =
+    COUNTRY_OPTIONS.find((c) => c.code === country)?.quickCities ?? [];
 
   return (
     <div>
@@ -91,6 +106,11 @@ export default function FreelancerAreasPage() {
                   {a.region && a.region !== a.city && (
                     <span className="text-xs text-stone">· {a.region}</span>
                   )}
+                  {a.country !== "AL" && (
+                    <span className="text-[10px] uppercase tracking-wider text-forest bg-forest/10 rounded-full px-1.5 py-0.5">
+                      {countryLabel(a.country)}
+                    </span>
+                  )}
                   <button
                     onClick={() => onRemove(a.id)}
                     aria-label={`Hiq ${a.city}`}
@@ -112,12 +132,29 @@ export default function FreelancerAreasPage() {
                 {error}
               </div>
             )}
+            <label className="block">
+              <span className="text-xs font-medium uppercase tracking-wider text-ink-muted">
+                Vendi
+              </span>
+              <select
+                value={country}
+                onChange={(e) => {
+                  setCountry(e.target.value);
+                  setCity("");
+                }}
+                className="mt-1 w-full rounded-md border border-line bg-surface px-3 py-2 text-sm text-ink focus:outline-none focus:ring-2 focus:ring-forest/15"
+              >
+                {COUNTRY_OPTIONS.map((c) => (
+                  <option key={c.code} value={c.code}>{c.label}</option>
+                ))}
+              </select>
+            </label>
             <div className="grid grid-cols-2 gap-3">
               <Field
                 label="Qyteti"
                 value={city}
                 onChange={(e) => setCity(e.target.value)}
-                placeholder="p.sh. Tiranë"
+                placeholder={country === "AL" ? "p.sh. Tiranë" : "p.sh. " + (quickCities[0] ?? "")}
                 required
               />
               <Field
@@ -141,14 +178,14 @@ export default function FreelancerAreasPage() {
             Klikoni për të prefilluar formën.
           </p>
           <div className="mt-3 flex flex-wrap gap-1.5">
-            {ALBANIAN_CITIES.map((c) => (
+            {quickCities.map((c) => (
               <button
                 key={c}
                 onClick={() => quickAdd(c)}
-                disabled={existingCities.has(c)}
+                disabled={existingAreaKeys.has(`${country}:${c}`)}
                 className={[
                   "text-xs rounded-md px-2 py-1 border transition",
-                  existingCities.has(c)
+                  existingAreaKeys.has(`${country}:${c}`)
                     ? "border-line bg-surface-2 text-stone line-through opacity-60 cursor-not-allowed"
                     : "border-line bg-surface text-ink hover:border-forest hover:bg-surface-2",
                 ].join(" ")}

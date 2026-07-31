@@ -12,58 +12,68 @@ import {
   itemListSchema,
   serviceSchema,
 } from "@/lib/structured-data";
-import {
-  serverApi,
-  SITE,
-  ALBANIAN_CITIES,
-  hreflangAlternates,
-} from "@/lib/server-api";
-
-interface RouteParams {
-  params: Promise<{ slug: string }>;
-}
+import { serverApi, SITE, hreflangAlternates } from "@/lib/server-api";
+import type { CountryConfig } from "@/lib/countries";
 
 async function getCategory(slug: string) {
   const cats = await serverApi.categories();
   return cats?.find((c) => c.slug === slug.toLowerCase()) ?? null;
 }
 
-export async function generateMetadata({ params }: RouteParams): Promise<Metadata> {
-  const { slug } = await params;
+export async function categoryCountryMetadata(
+  country: CountryConfig,
+  slug: string,
+): Promise<Metadata> {
   const cat = await getCategory(slug);
   if (!cat) return { title: `Faqja nuk u gjet | ${SITE.name}` };
-  const title = `${cat.name} në Shqipëri | Gjej profesionistin | ${SITE.name}`;
-  const description = `Gjeni ${cat.name.toLowerCase()} të verifikuar në Shqipëri. Krahasoni çmimet, vlerësimet dhe zonat e punës. Përgjigje brenda orëve.`;
+
+  const url = `${SITE.url}${country.pathPrefix}/${slug}`;
+  const title = `${cat.name} shqiptarë në ${country.label} | ${SITE.name}`;
+  const description = `Gjeni ${cat.name.toLowerCase()} shqiptarë të verifikuar në ${country.label}. Krahasoni çmimet, vlerësimet dhe zonat e punës.`;
+
+  const list = await serverApi.searchFreelancers({
+    category: slug,
+    country: country.apiCountry,
+    page_size: 1,
+  });
+  const total = list?.count ?? 0;
+
   return {
     title,
     description,
     alternates: {
-      canonical: `${SITE.url}/${slug}`,
+      canonical: url,
       languages: hreflangAlternates(`/${slug}`),
     },
+    // Don't index an empty category page in a brand-new market — avoid
+    // thin content while supply is still zero. Flips to indexable the
+    // moment the first freelancer lists here.
+    robots: total > 0 ? undefined : { index: false, follow: true },
     openGraph: {
       title,
       description,
-      url: `${SITE.url}/${slug}`,
+      url,
       siteName: SITE.name,
-      locale: "sq_AL",
+      locale: country.locale.replace("-", "_"),
       type: "website",
     },
-    keywords: [
-      cat.name,
-      cat.name_en,
-      `${cat.name} Tiranë`,
-      `${cat.name} Shqipëri`,
-    ].filter(Boolean) as string[],
   };
 }
 
-export default async function CategoryDetailPage({ params }: RouteParams) {
-  const { slug } = await params;
+export async function CategoryCountryView({
+  country,
+  slug,
+}: {
+  country: CountryConfig;
+  slug: string;
+}) {
   const cat = await getCategory(slug);
   if (!cat) notFound();
 
-  const list = await serverApi.searchFreelancers({ category: slug });
+  const list = await serverApi.searchFreelancers({
+    category: slug,
+    country: country.apiCountry,
+  });
   const freelancers = list?.results ?? [];
   const total = list?.count ?? 0;
 
@@ -74,8 +84,8 @@ export default async function CategoryDetailPage({ params }: RouteParams) {
           serviceSchema(cat),
           breadcrumbSchema([
             { name: "Kreu", url: SITE.url },
-            { name: "Kategoritë", url: `${SITE.url}/kategorite` },
-            { name: cat.name, url: `${SITE.url}/${cat.slug}` },
+            { name: country.label, url: `${SITE.url}${country.pathPrefix}` },
+            { name: cat.name, url: `${SITE.url}${country.pathPrefix}/${cat.slug}` },
           ]),
           ...(freelancers.length > 0
             ? [
@@ -92,18 +102,12 @@ export default async function CategoryDetailPage({ params }: RouteParams) {
       <PublicHeader />
       <main className="flex-1">
         <section className="bg-gradient-warm relative overflow-hidden">
-          <div
-            aria-hidden="true"
-            className="absolute -top-32 -right-32 w-[480px] h-[480px] rounded-full opacity-60"
-            style={{
-              background:
-                "radial-gradient(closest-side, rgba(31, 77, 58, 0.10), transparent)",
-            }}
-          />
-
           <div className="max-w-6xl mx-auto px-6 sm:px-8 py-14 sm:py-20 relative">
-            <Link href="/kategorite" className="text-xs text-stone hover:text-ink">
-              ← Të gjitha kategoritë
+            <Link
+              href={country.pathPrefix}
+              className="text-xs text-stone hover:text-ink"
+            >
+              ← {country.label}
             </Link>
 
             <div className="mt-6 flex items-start gap-6">
@@ -120,33 +124,30 @@ export default async function CategoryDetailPage({ params }: RouteParams) {
               </div>
               <div className="min-w-0">
                 <p className="text-xs uppercase tracking-wider text-stone">
-                  Kategori
+                  {cat.name} · {country.label}
                 </p>
                 <h1 className="mt-1 font-display text-5xl sm:text-6xl text-ink leading-[1.05]">
                   {cat.name}
                 </h1>
-                {cat.name_en && (
-                  <p className="mt-2 text-base text-ink-muted italic">
-                    {cat.name_en}
-                  </p>
-                )}
               </div>
             </div>
 
             <p className="mt-6 text-base text-ink-muted max-w-2xl">
               {total > 0
-                ? `${total}${list?.next ? "+" : ""} profesionistë të verifikuar.`
-                : "Ende pa profesionistë të listuar në këtë kategori."}{" "}
+                ? `${total}${list?.next ? "+" : ""} profesionistë shqiptarë të verifikuar në ${country.label}.`
+                : `Ende pa profesionistë shqiptarë të listuar në këtë kategori në ${country.label}.`}{" "}
               Krahasoni çmimet, lexoni vlerësimet dhe zgjidhni atë që ju
               përshtatet më mirë.
             </p>
             <div className="mt-6 flex flex-wrap gap-3">
-              <Link href={`/profesionistet?category=${cat.slug}`}>
+              <Link
+                href={`/profesionistet?country=${country.apiCountry}&category=${cat.slug}`}
+              >
                 <Button variant="primary" size="lg">
                   Filtroni më hollësisht →
                 </Button>
               </Link>
-              <Link href={`/regjistrohu?role=freelancer`}>
+              <Link href="/regjistrohu?role=freelancer">
                 <Button variant="secondary" size="lg">
                   Bëhuni profesionist
                 </Button>
@@ -160,9 +161,13 @@ export default async function CategoryDetailPage({ params }: RouteParams) {
             <div className="card p-10 text-center">
               <p className="text-base text-ink-muted">
                 Asnjë profesionist nuk është listuar ende në kategorinë{" "}
-                <span className="font-medium text-ink">{cat.name}</span>.
+                <span className="font-medium text-ink">{cat.name}</span> në{" "}
+                {country.label}.
               </p>
-              <Link href="/regjistrohu?role=freelancer" className="mt-5 inline-block">
+              <Link
+                href="/regjistrohu?role=freelancer"
+                className="mt-5 inline-block"
+              >
                 <Button variant="primary">Bëhu i pari!</Button>
               </Link>
             </div>
@@ -177,7 +182,9 @@ export default async function CategoryDetailPage({ params }: RouteParams) {
                 </span>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                {freelancers.map((f) => <FreelancerCard key={f.id} f={f} />)}
+                {freelancers.map((f) => (
+                  <FreelancerCard key={f.id} f={f} />
+                ))}
               </div>
             </>
           )}
@@ -189,13 +196,13 @@ export default async function CategoryDetailPage({ params }: RouteParams) {
               Sipas qytetit
             </p>
             <h2 className="font-display text-3xl text-ink">
-              {cat.name} në qytetin tuaj
+              {cat.name} në {country.label}
             </h2>
             <ul className="mt-6 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 text-sm">
-              {ALBANIAN_CITIES.slice(0, 12).map((city) => (
+              {country.cities.map((city) => (
                 <li key={city.slug}>
                   <Link
-                    href={`/profesionistet?category=${cat.slug}&city=${encodeURIComponent(city.name)}`}
+                    href={`/profesionistet?country=${country.apiCountry}&category=${cat.slug}&city=${encodeURIComponent(city.name)}`}
                     className="card card-link block px-4 py-3"
                   >
                     <span className="text-ink font-medium">{cat.name}</span>{" "}
