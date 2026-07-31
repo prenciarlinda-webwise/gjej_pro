@@ -25,11 +25,12 @@ export async function categoryCountryMetadata(
   slug: string,
 ): Promise<Metadata> {
   const cat = await getCategory(slug);
-  if (!cat) return { title: `Faqja nuk u gjet | ${SITE.name}` };
+  if (!cat) return { title: "Page not found" };
+  const name = cat.name_en || cat.name;
 
   const url = `${SITE.url}${country.pathPrefix}/${slug}`;
-  const title = `${cat.name} shqiptarë në ${country.label} | ${SITE.name}`;
-  const description = `Gjeni ${cat.name.toLowerCase()} shqiptarë të verifikuar në ${country.label}. Krahasoni çmimet, vlerësimet dhe zonat e punës.`;
+  const title = `Albanian ${name} in ${country.inLabel}`;
+  const description = `Find verified Albanian ${name} professionals in ${country.inLabel}. Compare prices, reviews, and service areas.`;
 
   const list = await serverApi.searchFreelancers({
     category: slug,
@@ -69,6 +70,7 @@ export async function CategoryCountryView({
 }) {
   const cat = await getCategory(slug);
   if (!cat) notFound();
+  const name = cat.name_en || cat.name;
 
   const list = await serverApi.searchFreelancers({
     category: slug,
@@ -83,9 +85,9 @@ export async function CategoryCountryView({
         data={[
           serviceSchema(cat),
           breadcrumbSchema([
-            { name: "Kreu", url: SITE.url },
+            { name: "Home", url: SITE.url },
             { name: country.label, url: `${SITE.url}${country.pathPrefix}` },
-            { name: cat.name, url: `${SITE.url}${country.pathPrefix}/${cat.slug}` },
+            { name, url: `${SITE.url}${country.pathPrefix}/${cat.slug}` },
           ]),
           ...(freelancers.length > 0
             ? [
@@ -99,7 +101,7 @@ export async function CategoryCountryView({
             : []),
         ]}
       />
-      <PublicHeader />
+      <PublicHeader locale="en" />
       <main className="flex-1">
         <section className="bg-gradient-warm relative overflow-hidden">
           <div className="max-w-6xl mx-auto px-6 sm:px-8 py-14 sm:py-20 relative">
@@ -124,32 +126,32 @@ export async function CategoryCountryView({
               </div>
               <div className="min-w-0">
                 <p className="text-xs uppercase tracking-wider text-stone">
-                  {cat.name} · {country.label}
+                  {name} · {country.label}
                 </p>
                 <h1 className="mt-1 font-display text-5xl sm:text-6xl text-ink leading-[1.05]">
-                  {cat.name}
+                  {name}
                 </h1>
               </div>
             </div>
 
             <p className="mt-6 text-base text-ink-muted max-w-2xl">
               {total > 0
-                ? `${total}${list?.next ? "+" : ""} profesionistë shqiptarë të verifikuar në ${country.label}.`
-                : `Ende pa profesionistë shqiptarë të listuar në këtë kategori në ${country.label}.`}{" "}
-              Krahasoni çmimet, lexoni vlerësimet dhe zgjidhni atë që ju
-              përshtatet më mirë.
+                ? `${total}${list?.next ? "+" : ""} verified Albanian professional${total === 1 && !list?.next ? "" : "s"} in ${country.inLabel}.`
+                : `No Albanian professionals listed in this category in ${country.inLabel} yet.`}{" "}
+              Compare prices, read reviews, and choose the one that fits you
+              best.
             </p>
             <div className="mt-6 flex flex-wrap gap-3">
               <Link
                 href={`/profesionistet?country=${country.apiCountry}&category=${cat.slug}`}
               >
                 <Button variant="primary" size="lg">
-                  Filtroni më hollësisht →
+                  Filter in detail →
                 </Button>
               </Link>
-              <Link href="/regjistrohu?role=freelancer">
+              <Link href="/regjistrohu?role=freelancer&locale=en">
                 <Button variant="secondary" size="lg">
-                  Bëhuni profesionist
+                  Become a professional
                 </Button>
               </Link>
             </div>
@@ -160,30 +162,30 @@ export async function CategoryCountryView({
           {freelancers.length === 0 ? (
             <div className="card p-10 text-center">
               <p className="text-base text-ink-muted">
-                Asnjë profesionist nuk është listuar ende në kategorinë{" "}
-                <span className="font-medium text-ink">{cat.name}</span> në{" "}
-                {country.label}.
+                No professional is listed yet in the{" "}
+                <span className="font-medium text-ink">{name}</span> category
+                in {country.inLabel}.
               </p>
               <Link
-                href="/regjistrohu?role=freelancer"
+                href="/regjistrohu?role=freelancer&locale=en"
                 className="mt-5 inline-block"
               >
-                <Button variant="primary">Bëhu i pari!</Button>
+                <Button variant="primary">Be the first!</Button>
               </Link>
             </div>
           ) : (
             <>
               <div className="flex items-baseline justify-between mb-6">
                 <h2 className="font-display text-2xl text-ink">
-                  Profesionistët e listuar
+                  Listed professionals
                 </h2>
                 <span className="text-xs text-stone numeric">
-                  {total} rezultate
+                  {total} {total === 1 ? "result" : "results"}
                 </span>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
                 {freelancers.map((f) => (
-                  <FreelancerCard key={f.id} f={f} />
+                  <FreelancerCard key={f.id} f={f} locale="en" />
                 ))}
               </div>
             </>
@@ -193,10 +195,10 @@ export async function CategoryCountryView({
         <section className="border-t border-line bg-surface">
           <div className="max-w-6xl mx-auto px-6 sm:px-8 py-14">
             <p className="text-xs uppercase tracking-wider text-stone mb-1">
-              Sipas qytetit
+              By city
             </p>
             <h2 className="font-display text-3xl text-ink">
-              {cat.name} në {country.label}
+              {name} in {country.inLabel}
             </h2>
             <ul className="mt-6 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 text-sm">
               {country.cities.map((city) => (
@@ -205,11 +207,11 @@ export async function CategoryCountryView({
                     href={`/profesionistet?country=${country.apiCountry}&category=${cat.slug}&city=${encodeURIComponent(city.name)}`}
                     className="card card-link block px-4 py-3"
                   >
-                    <span className="text-ink font-medium">{cat.name}</span>{" "}
-                    <span className="text-stone">në</span>{" "}
+                    <span className="text-ink font-medium">{name}</span>{" "}
+                    <span className="text-stone">in</span>{" "}
                     <span className="text-ink font-medium">{city.name}</span>
                     <span className="block mt-1 text-xs text-forest">
-                      Shih profesionistët →
+                      See professionals →
                     </span>
                   </Link>
                 </li>
@@ -218,7 +220,7 @@ export async function CategoryCountryView({
           </div>
         </section>
       </main>
-      <PublicFooter />
+      <PublicFooter locale="en" country={country} />
     </>
   );
 }

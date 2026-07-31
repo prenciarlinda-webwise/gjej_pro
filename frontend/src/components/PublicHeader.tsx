@@ -6,8 +6,39 @@ import { Button } from "@/components/Button";
 import { useAuth } from "@/lib/auth-context";
 import { dashboardPathFor } from "@/lib/api";
 
-export function PublicHeader() {
+export type UiLocale = "sq" | "en";
+
+const HEADER_STRINGS: Record<UiLocale, {
+  professionals: string;
+  categories: string;
+  howItWorks: string;
+  dashboard: string;
+  login: string;
+  signup: string;
+}> = {
+  sq: {
+    professionals: "Profesionistët",
+    categories: "Kategoritë",
+    howItWorks: "Si funksionon",
+    dashboard: "Paneli",
+    login: "Hyr",
+    signup: "Regjistrohu",
+  },
+  en: {
+    professionals: "Professionals",
+    categories: "Categories",
+    howItWorks: "How it works",
+    dashboard: "Dashboard",
+    login: "Log in",
+    signup: "Sign up",
+  },
+};
+
+export function PublicHeader({ locale = "sq" }: { locale?: UiLocale }) {
   const { user, loading } = useAuth();
+  const t = HEADER_STRINGS[locale];
+  const loginHref = locale === "en" ? "/hyr?locale=en" : "/hyr";
+  const signupHref = locale === "en" ? "/regjistrohu?locale=en" : "/regjistrohu";
 
   return (
     <header className="border-b border-line bg-bg/90 backdrop-blur sticky top-0 z-10">
@@ -16,32 +47,32 @@ export function PublicHeader() {
         <nav className="flex items-center gap-1.5 flex-wrap justify-end">
           <Link href="/profesionistet" className="hidden sm:inline-block">
             <Button variant="ghost" size="md">
-              Profesionistët
+              {t.professionals}
             </Button>
           </Link>
           <Link href="/kategorite" className="hidden md:inline-block">
             <Button variant="ghost" size="md">
-              Kategoritë
+              {t.categories}
             </Button>
           </Link>
           <Link href="/si-funksionon" className="hidden md:inline-block">
             <Button variant="ghost" size="md">
-              Si funksionon
+              {t.howItWorks}
             </Button>
           </Link>
           {!loading && user ? (
             <Link href={dashboardPathFor(user.role)}>
               <Button variant="primary" size="md">
-                Paneli
+                {t.dashboard}
               </Button>
             </Link>
           ) : (
             <>
-              <Link href="/hyr">
-                <Button variant="ghost" size="md">Hyr</Button>
+              <Link href={loginHref}>
+                <Button variant="ghost" size="md">{t.login}</Button>
               </Link>
-              <Link href="/regjistrohu">
-                <Button variant="primary" size="md">Regjistrohu</Button>
+              <Link href={signupHref}>
+                <Button variant="primary" size="md">{t.signup}</Button>
               </Link>
             </>
           )}

@@ -21,11 +21,11 @@ export async function CountryHubPage({ country }: { country: CountryConfig }) {
     <>
       <JsonLd
         data={breadcrumbSchema([
-          { name: "Kreu", url: SITE.url },
+          { name: "Home", url: SITE.url },
           { name: country.label, url: `${SITE.url}${country.pathPrefix}` },
         ])}
       />
-      <PublicHeader />
+      <PublicHeader locale="en" />
       <main className="flex-1">
         <section className="bg-gradient-warm">
           <div className="max-w-6xl mx-auto px-6 sm:px-8 pt-16 pb-20 sm:pt-24 sm:pb-28">
@@ -39,17 +39,17 @@ export async function CountryHubPage({ country }: { country: CountryConfig }) {
               {country.heroBody}
             </p>
             <p className="mt-3 text-sm font-medium text-forest max-w-xl">
-              0% komision platforme. Falas për profesionistët dhe klientët.
+              0% platform commission. Free for professionals and clients.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link href={`/profesionistet?country=${country.apiCountry}`}>
                 <Button variant="primary" size="lg">
-                  Shiko profesionistët →
+                  See professionals →
                 </Button>
               </Link>
-              <Link href="/regjistrohu?role=freelancer">
+              <Link href="/regjistrohu?role=freelancer&locale=en">
                 <Button variant="secondary" size="lg">
-                  Bëhu profesionist
+                  Become a professional
                 </Button>
               </Link>
             </div>
@@ -61,18 +61,18 @@ export async function CountryHubPage({ country }: { country: CountryConfig }) {
             <div className="max-w-6xl mx-auto px-6 sm:px-8 py-12">
               <div className="card p-8 text-center max-w-2xl mx-auto">
                 <p className="text-xs uppercase tracking-wider text-forest mb-2">
-                  Sapo po nisim këtu
+                  Just getting started here
                 </p>
                 <h2 className="font-display text-2xl text-ink">
-                  Ende s&apos;ka profesionistë të listuar në {country.label}.
+                  No professionals listed in {country.inLabel} yet.
                 </h2>
                 <p className="mt-3 text-ink-muted">
-                  Jeni profesionist shqiptar në {country.label}? Krijoni
-                  profilin tuaj falas dhe bëhuni i pari që klientët gjejnë.
+                  Are you an Albanian professional in {country.inLabel}? Create
+                  your free profile and be the first clients find.
                 </p>
                 <div className="mt-5">
-                  <Link href="/regjistrohu?role=freelancer">
-                    <Button variant="primary">Bëhu i pari →</Button>
+                  <Link href="/regjistrohu?role=freelancer&locale=en">
+                    <Button variant="primary">Be the first →</Button>
                   </Link>
                 </div>
               </div>
@@ -83,10 +83,10 @@ export async function CountryHubPage({ country }: { country: CountryConfig }) {
         <section className="border-t border-line bg-surface">
           <div className="max-w-6xl mx-auto px-6 sm:px-8 py-14">
             <p className="text-xs uppercase tracking-wider text-stone mb-1">
-              Kategoritë
+              Categories
             </p>
             <h2 className="font-display text-3xl text-ink">
-              Çfarë po kërkoni?
+              What are you looking for?
             </h2>
             <div className="mt-6 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
               {cats.slice(0, 12).map((c) => (
@@ -107,7 +107,7 @@ export async function CountryHubPage({ country }: { country: CountryConfig }) {
                     <CategoryIcon slug={c.icon || "monitor"} size={22} />
                   </div>
                   <h3 className="mt-4 font-display text-lg text-ink leading-tight">
-                    {c.name}
+                    {c.name_en || c.name}
                   </h3>
                 </Link>
               ))}
@@ -117,7 +117,7 @@ export async function CountryHubPage({ country }: { country: CountryConfig }) {
                 href="/kategorite"
                 className="text-sm font-medium text-forest hover:underline"
               >
-                Të gjitha kategoritë →
+                All categories →
               </Link>
             </div>
           </div>
@@ -126,10 +126,10 @@ export async function CountryHubPage({ country }: { country: CountryConfig }) {
         <section>
           <div className="max-w-6xl mx-auto px-6 sm:px-8 py-14">
             <p className="text-xs uppercase tracking-wider text-stone mb-1">
-              Qytetet
+              Cities
             </p>
             <h2 className="font-display text-3xl text-ink">
-              {country.label} — sipas qytetit
+              {country.label} — by city
             </h2>
             <ul className="mt-6 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 text-sm">
               {country.cities.map((city) => (
@@ -140,7 +140,7 @@ export async function CountryHubPage({ country }: { country: CountryConfig }) {
                   >
                     <span className="text-ink font-medium">{city.name}</span>
                     <span className="block mt-1 text-xs text-forest">
-                      Shih profesionistët →
+                      See professionals →
                     </span>
                   </Link>
                 </li>
@@ -152,23 +152,23 @@ export async function CountryHubPage({ country }: { country: CountryConfig }) {
         <section className="border-t border-line bg-surface">
           <div className="max-w-6xl mx-auto px-6 sm:px-8 py-14 text-center">
             <h2 className="font-display text-2xl text-ink">
-              Jeni profesionist shqiptar në {country.label}?
+              Are you an Albanian professional in {country.inLabel}?
             </h2>
             <p className="mt-2 text-ink-muted max-w-xl mx-auto">
-              Krijoni profilin tuaj falas. Pa abonime, pa komisione — 100% e
-              çmimit shkon te ju.
+              Create your free profile. No subscriptions, no commissions —
+              100% of the price goes to you.
             </p>
             <div className="mt-5">
-              <Link href="/regjistrohu?role=freelancer">
+              <Link href="/regjistrohu?role=freelancer&locale=en">
                 <Button variant="primary" size="lg">
-                  Regjistrohu falas
+                  Sign up free
                 </Button>
               </Link>
             </div>
           </div>
         </section>
       </main>
-      <PublicFooter />
+      <PublicFooter locale="en" country={country} />
     </>
   );
 }

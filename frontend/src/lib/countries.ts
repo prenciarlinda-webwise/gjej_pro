@@ -1,8 +1,10 @@
 /**
- * Country expansion config. Same Albanian-language product as the default
- * (Albania) site — these sections target Albanian-diaspora audiences who
- * live in the US/UK, not the general local population. See COUNTRY_LOCALES
- * in server-api.ts for the hreflang-facing summary of this same list.
+ * Country expansion config. Unlike the default (Albania) site — which is
+ * Albanian-language, for an Albanian audience — these sections are in
+ * English: they target both the Albanian diaspora AND local clients in the
+ * US/UK who want to hire Albanian professionals, so the content needs to be
+ * readable by non-Albanian speakers. See COUNTRY_LOCALES in server-api.ts
+ * for the hreflang-facing summary of this same list.
  */
 import { SITE } from "./server-api";
 
@@ -19,7 +21,12 @@ export interface CountryConfig {
   apiCountry: string;
   pathPrefix: string;
   locale: string;
+  /** Bare form — use standalone (breadcrumbs, back-links, "X — by city" headings). */
   label: string;
+  /** Grammatical form for use after a preposition, e.g. "in {inLabel}" ->
+   * "in the United Kingdom". Both current countries take "the"; a future
+   * country that doesn't (e.g. "Italy") would just set this equal to `label`. */
+  inLabel: string;
   heroKicker: string;
   heroTitle: string;
   heroBody: string;
@@ -55,24 +62,26 @@ export const COUNTRIES: Record<CountryCode, CountryConfig> = {
     code: "uk",
     apiCountry: "GB",
     pathPrefix: "/uk",
-    locale: "sq-GB",
-    label: "Mbretëria e Bashkuar",
-    heroKicker: "Gjej Pro në Mbretërinë e Bashkuar",
-    heroTitle: "Profesionistë shqiptarë, pranë jush në MB.",
+    locale: "en-GB",
+    label: "United Kingdom",
+    inLabel: "the United Kingdom",
+    heroKicker: "Gjej Pro in the United Kingdom",
+    heroTitle: "Albanian professionals, near you in the UK.",
     heroBody:
-      `${SITE.name} po vjen për komunitetin shqiptar në Mbretërinë e Bashkuar: i njëjti platformë falas, 0% komision, tani edhe këtu.`,
+      `${SITE.name} is coming to the Albanian community in the United Kingdom: the same free platform, 0% commission, now here too.`,
     cities: UK_CITIES,
   },
   us: {
     code: "us",
     apiCountry: "US",
     pathPrefix: "/us",
-    locale: "sq-US",
-    label: "Shtetet e Bashkuara",
-    heroKicker: "Gjej Pro në Shtetet e Bashkuara",
-    heroTitle: "Profesionistë shqiptarë, pranë jush në SHBA.",
+    locale: "en-US",
+    label: "United States",
+    inLabel: "the United States",
+    heroKicker: "Gjej Pro in the United States",
+    heroTitle: "Albanian professionals, near you in the US.",
     heroBody:
-      `${SITE.name} po vjen për komunitetin shqiptar në Shtetet e Bashkuara: i njëjti platformë falas, 0% komision, tani edhe këtu.`,
+      `${SITE.name} is coming to the Albanian community in the United States: the same free platform, 0% commission, now here too.`,
     cities: US_CITIES,
   },
 };

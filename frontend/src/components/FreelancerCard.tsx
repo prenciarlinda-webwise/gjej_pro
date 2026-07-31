@@ -1,13 +1,47 @@
 import Link from "next/link";
 import { Avatar } from "@/components/Avatar";
 import type { FreelancerListItem } from "@/lib/api";
+import type { UiLocale } from "@/components/PublicHeader";
 
-export function FreelancerCard({ f }: { f: FreelancerListItem }) {
+const STRINGS: Record<UiLocale, {
+  quoteBased: string;
+  perHour: string;
+  verified: string;
+  review: string;
+  reviews: string;
+  new: string;
+}> = {
+  sq: {
+    quoteBased: "Me ofertë",
+    perHour: " / orë",
+    verified: "Verifikuar",
+    review: "vlerësim",
+    reviews: "vlerësime",
+    new: "I ri",
+  },
+  en: {
+    quoteBased: "Quote-based",
+    perHour: " / hr",
+    verified: "Verified",
+    review: "review",
+    reviews: "reviews",
+    new: "New",
+  },
+};
+
+export function FreelancerCard({
+  f,
+  locale = "sq",
+}: {
+  f: FreelancerListItem;
+  locale?: UiLocale;
+}) {
+  const t = STRINGS[locale];
   const rate =
     f.hourly_rate_min || f.hourly_rate_max
       ? `${f.hourly_rate_min ?? "?"}–${f.hourly_rate_max ?? "?"} ${f.currency}`
-      : "Me ofertë";
-  const ratePer = f.hourly_rate_min || f.hourly_rate_max ? " / orë" : "";
+      : t.quoteBased;
+  const ratePer = f.hourly_rate_min || f.hourly_rate_max ? t.perHour : "";
 
   return (
     <Link
@@ -24,9 +58,9 @@ export function FreelancerCard({ f }: { f: FreelancerListItem }) {
             {f.is_verified && (
               <span
                 className="text-[10px] uppercase tracking-wider text-gold-deep border border-gold/40 bg-gold/10 rounded-full px-2 py-0.5"
-                title="I verifikuar"
+                title={t.verified}
               >
-                ✓ Verifikuar
+                ✓ {t.verified}
               </span>
             )}
           </div>
@@ -45,7 +79,7 @@ export function FreelancerCard({ f }: { f: FreelancerListItem }) {
               key={c.id}
               className="text-[11px] text-ink-muted bg-surface-2 border border-line rounded-full px-2.5 py-0.5"
             >
-              {c.name}
+              {locale === "en" ? c.name_en || c.name : c.name}
             </span>
           ))}
         </div>
@@ -71,12 +105,12 @@ export function FreelancerCard({ f }: { f: FreelancerListItem }) {
               ★ {f.avg_rating}
             </div>
             <div className="text-[10px] uppercase tracking-wider text-stone numeric">
-              {f.review_count} {f.review_count === 1 ? "vlerësim" : "vlerësime"}
+              {f.review_count} {f.review_count === 1 ? t.review : t.reviews}
             </div>
           </div>
         ) : (
           <div className="text-[10px] uppercase tracking-wider text-stone">
-            I ri
+            {t.new}
           </div>
         )}
       </div>

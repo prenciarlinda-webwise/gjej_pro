@@ -6,15 +6,15 @@ import { SITE, hreflangAlternates } from "@/lib/server-api";
 const country = COUNTRIES.us;
 
 export const metadata: Metadata = {
-  title: `${SITE.name} në ${country.label}`,
-  description: `${country.heroBody} Kërkoni profesionistë shqiptarë të verifikuar në ${country.label}: elektricistë, hidraulikë, pastrues e shumë të tjerë.`,
+  title: `${SITE.name} in ${country.inLabel}`,
+  description: `${country.heroBody} Search for verified Albanian professionals in ${country.inLabel}: electricians, plumbers, cleaners, and many more.`,
   alternates: {
     canonical: `${SITE.url}${country.pathPrefix}`,
     // "" = the hub page itself (AL's equivalent is the homepage "/").
     languages: hreflangAlternates(""),
   },
   openGraph: {
-    title: `${SITE.name} në ${country.label}`,
+    title: `${SITE.name} in ${country.inLabel}`,
     description: country.heroBody,
     url: `${SITE.url}${country.pathPrefix}`,
     siteName: SITE.name,

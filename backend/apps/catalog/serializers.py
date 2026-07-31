@@ -126,7 +126,10 @@ class FreelancerListItemSerializer(serializers.Serializer):
         seen: dict[int, dict] = {}
         for s in obj.services.filter(is_active=True).select_related("category"):
             c = s.category
-            seen.setdefault(c.id, {"id": c.id, "name": c.name, "slug": c.slug})
+            seen.setdefault(
+                c.id,
+                {"id": c.id, "name": c.name, "name_en": c.name_en, "slug": c.slug},
+            )
         return list(seen.values())
 
 
@@ -163,7 +166,10 @@ class FreelancerDetailSerializer(serializers.Serializer):
         seen: dict[int, dict] = {}
         for s in obj.services.filter(is_active=True).select_related("category"):
             c = s.category
-            seen.setdefault(c.id, {"id": c.id, "name": c.name, "slug": c.slug})
+            seen.setdefault(
+                c.id,
+                {"id": c.id, "name": c.name, "name_en": c.name_en, "slug": c.slug},
+            )
         return list(seen.values())
 
     def get_cities(self, obj) -> list[str]:

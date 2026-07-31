@@ -184,17 +184,14 @@ export const SITE = {
 };
 
 /**
- * Planned country expansion — same Albanian-language product, reachable by
- * and locally relevant to Albanian-diaspora audiences in each country
- * (not a translation into English/local languages). `path` is the future
- * subdirectory prefix (e.g. `/uk` -> gjejpro.al/uk/...).
+ * Country expansion — the default (Albania) section is Albanian-language,
+ * for an Albanian audience; the US/UK sections are English-language, aimed
+ * at both the Albanian diaspora and local clients hiring Albanian
+ * professionals there. `path` is the subdirectory prefix (e.g. `/uk` ->
+ * gjejpro.al/uk/...).
  *
- * None of these are live yet: no routes exist under `path`, and nothing
- * currently emits hreflang tags for them (an hreflang alternate pointing at
- * a 404 is worse than no hreflang at all). Once a country section ships,
- * add it here with `live: true` and wire `alternates.languages` on every
- * page pair using this list — that's the only change needed to make
- * hreflang correct across the whole site.
+ * `alternates.languages` is wired on every page pair using this list —
+ * that's the only change needed to keep hreflang correct across the site.
  */
 export const COUNTRY_LOCALES: Array<{
   locale: string; // BCP-47
@@ -203,8 +200,8 @@ export const COUNTRY_LOCALES: Array<{
   live: boolean;
 }> = [
   { locale: "sq-AL", path: "", label: "Shqipëri", live: true },
-  { locale: "sq-GB", path: "/uk", label: "Mbretëria e Bashkuar", live: true },
-  { locale: "sq-US", path: "/us", label: "Shtetet e Bashkuara", live: true },
+  { locale: "en-GB", path: "/uk", label: "United Kingdom", live: true },
+  { locale: "en-US", path: "/us", label: "United States", live: true },
 ];
 
 /**

@@ -4,6 +4,7 @@ import "./globals.css";
 import { AuthProvider } from "@/lib/auth-context";
 import { NotificationsProvider } from "@/lib/notifications-context";
 import { JsonLd } from "@/components/JsonLd";
+import { LocaleHtmlLang } from "@/components/LocaleHtmlLang";
 import { organizationSchema, websiteSchema } from "@/lib/structured-data";
 import { SITE } from "@/lib/server-api";
 
@@ -19,10 +20,12 @@ const fraunces = Fraunces({
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE.url),
-  title: {
-    default: `${SITE.name} | Profesionistë për ju`,
-    template: `%s | ${SITE.name}`,
-  },
+  // Plain string, deliberately no `template`: every page in this codebase
+  // already composes its own full title including "${SITE.name}" — a
+  // template here would double the brand name (e.g. "X | Gjej Pro | Gjej
+  // Pro") on every one of them. This is only the fallback for the rare
+  // page that doesn't set its own title at all.
+  title: `${SITE.name} | Profesionistë për ju`,
   description: SITE.description,
   openGraph: {
     siteName: SITE.name,
@@ -47,6 +50,7 @@ export default function RootLayout({
       className={`${inter.variable} ${fraunces.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-bg text-ink">
+        <LocaleHtmlLang />
         <JsonLd data={[organizationSchema(), websiteSchema()]} />
         <AuthProvider>
           <NotificationsProvider>{children}</NotificationsProvider>

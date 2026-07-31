@@ -121,7 +121,7 @@ export interface FreelancerListItem {
   is_verified: boolean;
   avatar_url: string;
   cities: string[];
-  categories: { id: number; name: string; slug: string }[];
+  categories: { id: number; name: string; name_en: string; slug: string }[];
   updated_at?: string;
 }
 
