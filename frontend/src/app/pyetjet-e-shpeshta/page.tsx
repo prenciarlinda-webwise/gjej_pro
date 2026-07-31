@@ -3,6 +3,8 @@ import Link from "next/link";
 import { Button } from "@/components/Button";
 import { PublicFooter } from "@/components/PublicFooter";
 import { PublicHeader } from "@/components/PublicHeader";
+import { JsonLd } from "@/components/JsonLd";
+import { faqPageSchema } from "@/lib/structured-data";
 import { SITE } from "@/lib/server-api";
 
 export const metadata: Metadata = {
@@ -78,8 +80,10 @@ const SECTIONS: Array<{
 ];
 
 export default function FaqPage() {
+  const allQa = SECTIONS.flatMap((s) => s.qa);
   return (
     <>
+      <JsonLd data={faqPageSchema(allQa)} />
       <PublicHeader />
       <main className="flex-1 max-w-4xl mx-auto px-6 sm:px-8 py-12">
         <p className="text-xs uppercase tracking-wider text-stone">Pyetjet e shpeshta</p>

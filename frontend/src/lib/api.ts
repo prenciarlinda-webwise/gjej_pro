@@ -60,6 +60,15 @@ export interface Category {
   parent: number | null;
   sort_order: number;
   freelancer_count?: number;
+  updated_at?: string;
+}
+
+export interface RateBenchmark {
+  currency: string;
+  sample_size: number;
+  median: number | null;
+  p25: number | null;
+  scope: "city" | "country" | "global" | "insufficient";
 }
 
 export type PricingModel = "hourly" | "fixed" | "quote";
@@ -113,6 +122,7 @@ export interface FreelancerListItem {
   avatar_url: string;
   cities: string[];
   categories: { id: number; name: string; slug: string }[];
+  updated_at?: string;
 }
 
 export interface FreelancerDetail extends FreelancerListItem {
@@ -451,6 +461,20 @@ export const api = {
       method: "POST",
     }),
 
+  requestPasswordReset: (email: string) =>
+    rawFetch<{ detail: string }>("/auth/forgot-password/", {
+      method: "POST",
+      body: JSON.stringify({ email }),
+      auth: false,
+    }),
+
+  confirmPasswordReset: (token: string, password: string) =>
+    rawFetch<{ detail: string }>("/auth/reset-password/", {
+      method: "POST",
+      body: JSON.stringify({ token, password }),
+      auth: false,
+    }),
+
   myProfile: <P = FreelancerProfile | KlientProfile>() =>
     rawFetch<ProfilePayload<P>>("/profile/me/"),
 
@@ -463,6 +487,22 @@ export const api = {
     }),
 
   categories: () => rawFetch<Category[]>("/categories/", { auth: false }),
+
+  getRateBenchmark: (params: {
+    category: string;
+    city?: string;
+    country?: string;
+    currency?: string;
+  }) => {
+    const qs = new URLSearchParams();
+    qs.set("category", params.category);
+    if (params.city) qs.set("city", params.city);
+    if (params.country) qs.set("country", params.country);
+    if (params.currency) qs.set("currency", params.currency);
+    return rawFetch<RateBenchmark>(`/rate-benchmark/?${qs.toString()}`, {
+      auth: false,
+    });
+  },
 
   // Services (freelancer's own)
   myServices: () => rawFetch<Service[]>("/me/services/"),

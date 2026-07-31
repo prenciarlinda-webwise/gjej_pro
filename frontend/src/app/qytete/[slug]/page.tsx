@@ -5,6 +5,8 @@ import { Button } from "@/components/Button";
 import { FreelancerCard } from "@/components/FreelancerCard";
 import { PublicFooter } from "@/components/PublicFooter";
 import { PublicHeader } from "@/components/PublicHeader";
+import { JsonLd } from "@/components/JsonLd";
+import { breadcrumbSchema, itemListSchema } from "@/lib/structured-data";
 import { findCityBySlug, serverApi, SITE } from "@/lib/server-api";
 
 interface RouteParams {
@@ -51,6 +53,25 @@ export default async function CityDetailPage({ params }: RouteParams) {
 
   return (
     <>
+      <JsonLd
+        data={[
+          breadcrumbSchema([
+            { name: "Kreu", url: SITE.url },
+            { name: "Qytetet", url: `${SITE.url}/qytete` },
+            { name: city.name, url: `${SITE.url}/qytete/${city.slug}` },
+          ]),
+          ...(freelancers.length > 0
+            ? [
+                itemListSchema(
+                  freelancers.map((f) => ({
+                    name: f.full_name,
+                    url: `${SITE.url}/profesionist/${f.slug}`,
+                  })),
+                ),
+              ]
+            : []),
+        ]}
+      />
       <PublicHeader />
       <main className="flex-1">
         <section className="border-b border-line bg-surface">

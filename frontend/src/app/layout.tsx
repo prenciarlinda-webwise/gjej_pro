@@ -3,6 +3,9 @@ import { Inter, Fraunces } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/lib/auth-context";
 import { NotificationsProvider } from "@/lib/notifications-context";
+import { JsonLd } from "@/components/JsonLd";
+import { organizationSchema, websiteSchema } from "@/lib/structured-data";
+import { SITE } from "@/lib/server-api";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -15,9 +18,24 @@ const fraunces = Fraunces({
 });
 
 export const metadata: Metadata = {
-  title: "Gjej Pro | Profesionistë për ju",
-  description:
-    "Platforma më e madhe shqiptare për të gjetur mjeshtër dhe profesionistë të verifikuar.",
+  metadataBase: new URL(SITE.url),
+  title: {
+    default: `${SITE.name} | Profesionistë për ju`,
+    template: `%s | ${SITE.name}`,
+  },
+  description: SITE.description,
+  openGraph: {
+    siteName: SITE.name,
+    locale: "sq_AL",
+    type: "website",
+    images: [{ url: "/icon.png", width: 500, height: 250, alt: SITE.name }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: `${SITE.name} | Profesionistë për ju`,
+    description: SITE.description,
+    images: ["/icon.png"],
+  },
 };
 
 export default function RootLayout({
@@ -25,10 +43,11 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html
-      lang="sq"
+      lang={SITE.locale}
       className={`${inter.variable} ${fraunces.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-bg text-ink">
+        <JsonLd data={[organizationSchema(), websiteSchema()]} />
         <AuthProvider>
           <NotificationsProvider>{children}</NotificationsProvider>
         </AuthProvider>

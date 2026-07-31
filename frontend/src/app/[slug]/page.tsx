@@ -6,6 +6,12 @@ import { CategoryIcon } from "@/components/CategoryIcon";
 import { FreelancerCard } from "@/components/FreelancerCard";
 import { PublicFooter } from "@/components/PublicFooter";
 import { PublicHeader } from "@/components/PublicHeader";
+import { JsonLd } from "@/components/JsonLd";
+import {
+  breadcrumbSchema,
+  itemListSchema,
+  serviceSchema,
+} from "@/lib/structured-data";
 import { serverApi, SITE, ALBANIAN_CITIES } from "@/lib/server-api";
 
 interface RouteParams {
@@ -55,6 +61,26 @@ export default async function CategoryDetailPage({ params }: RouteParams) {
 
   return (
     <>
+      <JsonLd
+        data={[
+          serviceSchema(cat),
+          breadcrumbSchema([
+            { name: "Kreu", url: SITE.url },
+            { name: "Kategoritë", url: `${SITE.url}/kategorite` },
+            { name: cat.name, url: `${SITE.url}/${cat.slug}` },
+          ]),
+          ...(freelancers.length > 0
+            ? [
+                itemListSchema(
+                  freelancers.map((f) => ({
+                    name: f.full_name,
+                    url: `${SITE.url}/profesionist/${f.slug}`,
+                  })),
+                ),
+              ]
+            : []),
+        ]}
+      />
       <PublicHeader />
       <main className="flex-1">
         <section className="bg-gradient-warm relative overflow-hidden">

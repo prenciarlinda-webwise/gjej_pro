@@ -12,7 +12,7 @@ class CategorySerializer(serializers.ModelSerializer):
         model = Category
         fields = (
             "id", "name", "name_en", "slug", "icon", "parent",
-            "sort_order", "freelancer_count",
+            "sort_order", "freelancer_count", "updated_at",
         )
 
 
@@ -111,6 +111,7 @@ class FreelancerListItemSerializer(serializers.Serializer):
     avatar_url = serializers.SerializerMethodField()
     cities = serializers.SerializerMethodField()
     categories = serializers.SerializerMethodField()
+    updated_at = serializers.DateTimeField()
 
     def get_company_name(self, obj) -> str:
         return obj.company.name if obj.company else ""
@@ -150,6 +151,7 @@ class FreelancerDetailSerializer(serializers.Serializer):
     services = ServiceReadSerializer(many=True)
     service_areas = ServiceAreaSerializer(many=True)
     member_since = serializers.DateTimeField(source="user.date_joined")
+    updated_at = serializers.DateTimeField()
 
     def get_company_name(self, obj) -> str:
         return obj.company.name if obj.company else ""

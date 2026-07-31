@@ -5,6 +5,8 @@ import { ContactProfessionalButton } from "@/components/ContactProfessionalButto
 import { PublicFooter } from "@/components/PublicFooter";
 import { PublicHeader } from "@/components/PublicHeader";
 import { ReadOnlyStars } from "@/components/StarRating";
+import { JsonLd } from "@/components/JsonLd";
+import { breadcrumbSchema, freelancerSchema } from "@/lib/structured-data";
 import { serverApi, SITE } from "@/lib/server-api";
 
 interface RouteParams {
@@ -66,6 +68,19 @@ export default async function FreelancerDetailPage({ params }: RouteParams) {
 
   return (
     <>
+      <JsonLd
+        data={[
+          freelancerSchema(profile, reviews?.results ?? []),
+          breadcrumbSchema([
+            { name: "Kreu", url: SITE.url },
+            { name: "Profesionistët", url: `${SITE.url}/profesionistet` },
+            {
+              name: profile.full_name,
+              url: `${SITE.url}/profesionist/${profile.slug}`,
+            },
+          ]),
+        ]}
+      />
       <PublicHeader />
       <main className="flex-1">
         <section className="border-b border-line bg-surface">

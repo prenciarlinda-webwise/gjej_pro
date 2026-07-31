@@ -73,6 +73,7 @@ export const serverApi = {
     city?: string;
     slug?: string;
     page?: number;
+    page_size?: number;
   } = {}) => {
     const sp = new URLSearchParams();
     if (params.q) sp.set("q", params.q);
@@ -80,10 +81,42 @@ export const serverApi = {
     if (params.city) sp.set("city", params.city);
     if (params.slug) sp.set("slug", params.slug);
     if (params.page) sp.set("page", String(params.page));
+    if (params.page_size) sp.set("page_size", String(params.page_size));
     const qs = sp.toString();
     return ssrFetch<PaginatedResponse<FreelancerListItem>>(
       `/freelancers/${qs ? `?${qs}` : ""}`,
     );
+  },
+
+  /** Walks `next` pages (each at max page_size) up to `cap` items — used by the sitemap. */
+  allFreelancers: async (cap = 300): Promise<FreelancerListItem[]> => {
+    const out: FreelancerListItem[] = [];
+    let page = 1;
+    while (out.length < cap) {
+      const res = await serverApi.searchFreelancers({ page, page_size: 60 });
+      if (!res || res.results.length === 0) break;
+      out.push(...res.results);
+      if (!res.next) break;
+      page += 1;
+    }
+    return out.slice(0, cap);
+  },
+
+  /** Walks all blog pages (max page_size) up to `cap` posts — used by the sitemap. */
+  allBlogPosts: async (cap = 200): Promise<BlogPostListItem[]> => {
+    const out: BlogPostListItem[] = [];
+    let page = 1;
+    while (out.length < cap) {
+      const sp = new URLSearchParams({ page: String(page), page_size: "50" });
+      const res = await ssrFetch<PaginatedResponse<BlogPostListItem>>(
+        `/blog/posts/?${sp.toString()}`,
+      );
+      if (!res || res.results.length === 0) break;
+      out.push(...res.results);
+      if (!res.next) break;
+      page += 1;
+    }
+    return out.slice(0, cap);
   },
 
   /** Resolve a public slug to the underlying numeric user_id. */
@@ -139,4 +172,32 @@ export const SITE = {
   description:
     "Platforma më e madhe shqiptare për të gjetur mjeshtër dhe profesionistë të verifikuar: elektricistë, hidraulikë, bravandreqës, pastrues e shumë të tjerë.",
   url: process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3002",
+  // The only locale actually served today. Content is Albanian-language,
+  // targeted at Albania; use this (not a bare "sq") anywhere a BCP-47 tag
+  // is needed (html lang, og:locale, hreflang).
+  locale: "sq-AL",
 };
+
+/**
+ * Planned country expansion — same Albanian-language product, reachable by
+ * and locally relevant to Albanian-diaspora audiences in each country
+ * (not a translation into English/local languages). `path` is the future
+ * subdirectory prefix (e.g. `/uk` -> gjejpro.al/uk/...).
+ *
+ * None of these are live yet: no routes exist under `path`, and nothing
+ * currently emits hreflang tags for them (an hreflang alternate pointing at
+ * a 404 is worse than no hreflang at all). Once a country section ships,
+ * add it here with `live: true` and wire `alternates.languages` on every
+ * page pair using this list — that's the only change needed to make
+ * hreflang correct across the whole site.
+ */
+export const COUNTRY_LOCALES: Array<{
+  locale: string; // BCP-47
+  path: string; // "" for the default (Albania) section
+  label: string;
+  live: boolean;
+}> = [
+  { locale: "sq-AL", path: "", label: "Shqipëri", live: true },
+  { locale: "sq-GB", path: "/uk", label: "Mbretëria e Bashkuar", live: false },
+  { locale: "sq-US", path: "/us", label: "Shtetet e Bashkuara", live: false },
+];

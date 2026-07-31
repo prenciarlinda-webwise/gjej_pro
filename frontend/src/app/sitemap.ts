@@ -29,7 +29,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const categories = (await serverApi.categories()) ?? [];
   const categoryEntries: MetadataRoute.Sitemap = categories.map((c) => ({
     url: `${SITE.url}/${c.slug}`,
-    lastModified: now,
+    lastModified: c.updated_at ? new Date(c.updated_at) : now,
     changeFrequency: "weekly",
     priority: 0.8,
   }));
@@ -42,25 +42,24 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8,
   }));
 
-  // Per-freelancer detail pages (cap at first ~200 to keep sitemap reasonable)
-  const freelancersList = await serverApi.searchFreelancers({ page: 1 });
-  const freelancerEntries: MetadataRoute.Sitemap =
-    (freelancersList?.results ?? []).map((f) => ({
-      url: `${SITE.url}/profesionist/${f.slug}`,
-      lastModified: now,
-      changeFrequency: "weekly",
-      priority: 0.6,
-    }));
+  // Per-freelancer detail pages. Walks all result pages (capped at 300 —
+  // comfortably above current inventory; raise the cap well before it binds).
+  const allFreelancers = await serverApi.allFreelancers(300);
+  const freelancerEntries: MetadataRoute.Sitemap = allFreelancers.map((f) => ({
+    url: `${SITE.url}/profesionist/${f.slug}`,
+    lastModified: f.updated_at ? new Date(f.updated_at) : now,
+    changeFrequency: "weekly",
+    priority: 0.6,
+  }));
 
-  // Blog posts
-  const posts = await serverApi.blogPosts();
-  const postEntries: MetadataRoute.Sitemap =
-    (posts?.results ?? []).map((p) => ({
-      url: `${SITE.url}/blog/${p.slug}`,
-      lastModified: p.published_at ? new Date(p.published_at) : now,
-      changeFrequency: "monthly",
-      priority: 0.5,
-    }));
+  // Blog posts (capped at 200 — see allFreelancers note above).
+  const allPosts = await serverApi.allBlogPosts(200);
+  const postEntries: MetadataRoute.Sitemap = allPosts.map((p) => ({
+    url: `${SITE.url}/blog/${p.slug}`,
+    lastModified: p.published_at ? new Date(p.published_at) : now,
+    changeFrequency: "monthly",
+    priority: 0.5,
+  }));
 
   return [
     ...staticEntries,
