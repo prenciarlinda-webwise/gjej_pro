@@ -1,6 +1,9 @@
 services:
   postgis:
     image: postgis/postgis:16-3.5
+    # postgis/postgis has no native arm64 image for this tag; force amd64
+    # (runs fine under Docker Desktop's emulation on Apple Silicon).
+    platform: linux/amd64
     container_name: gjej_pro_postgis
     environment:
       POSTGRES_DB: ${DB_NAME:-gjej_pro_dev}

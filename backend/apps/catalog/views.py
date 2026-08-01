@@ -6,11 +6,13 @@ from rest_framework.exceptions import PermissionDenied
 from rest_framework.generics import ListAPIView, RetrieveAPIView
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from apps.accounts.models import User
 from apps.profiles.models import FreelancerProfile
 
 from .models import Category, Service, ServiceArea
+from .pricing import compute_rate_benchmark
 from .serializers import (
     CategorySerializer,
     FreelancerDetailSerializer,
@@ -42,6 +44,35 @@ class CategoryListView(ListAPIView):
                 ),
             )
             .order_by("sort_order", "name")
+        )
+
+
+class RateBenchmarkView(APIView):
+    """Public, read-only market-rate stats for a category + area — no
+    sensitive data, just aggregate numbers the frontend uses to decide
+    whether to show a non-blocking "below market rate" warning."""
+
+    permission_classes = (permissions.AllowAny,)
+
+    def get(self, request):
+        category_slug = (request.query_params.get("category") or "").strip()
+        city = (request.query_params.get("city") or "").strip()
+        country = (request.query_params.get("country") or "").strip()
+        currency = (request.query_params.get("currency") or "ALL").strip()
+
+        try:
+            category = Category.objects.get(slug=category_slug, is_active=True)
+        except Category.DoesNotExist:
+            return Response({
+                "currency": currency.upper(),
+                "sample_size": 0,
+                "median": None,
+                "p25": None,
+                "scope": "insufficient",
+            })
+
+        return Response(
+            compute_rate_benchmark(category.id, city, country, currency),
         )
 
 

@@ -98,3 +98,36 @@ class EmailVerificationToken(models.Model):
     def consume(self) -> None:
         self.consumed_at = timezone.now()
         self.save(update_fields=["consumed_at"])
+
+
+def _new_reset_token() -> str:
+    return secrets.token_urlsafe(32)
+
+
+class PasswordResetToken(models.Model):
+    """One-time token used to authorize a password reset."""
+
+    TTL = timedelta(hours=1)
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="password_reset_tokens",
+    )
+    token = models.CharField(max_length=64, unique=True, default=_new_reset_token)
+    created_at = models.DateTimeField(auto_now_add=True)
+    consumed_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        db_table = "password_reset_tokens"
+        indexes = [models.Index(fields=["user", "-created_at"])]
+
+    def is_expired(self) -> bool:
+        return timezone.now() > self.created_at + self.TTL
+
+    def is_consumed(self) -> bool:
+        return self.consumed_at is not None
+
+    def consume(self) -> None:
+        self.consumed_at = timezone.now()
+        self.save(update_fields=["consumed_at"])

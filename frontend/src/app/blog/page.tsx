@@ -4,31 +4,77 @@ import { PublicFooter } from "@/components/PublicFooter";
 import { PublicHeader } from "@/components/PublicHeader";
 import { serverApi, SITE } from "@/lib/server-api";
 
-export const metadata: Metadata = {
-  title: `Blog | ${SITE.name}`,
-  description:
-    "Këshilla, udhëzues dhe histori nga komuniteti i Gjej Pro, për klientët dhe profesionistët.",
-  alternates: { canonical: `${SITE.url}/blog`, types: { "application/rss+xml": `${SITE.url}/blog/rss.xml` } },
+const STRINGS = {
+  sq: {
+    metaTitle: `Blog | ${SITE.name}`,
+    metaDescription:
+      "Këshilla, udhëzues dhe histori nga komuniteti i Gjej Pro, për klientët dhe profesionistët.",
+    kicker: "Blog",
+    heroTitle: "Histori, këshilla dhe udhëzues.",
+    heroSubtitle:
+      "Çfarë po ndodh në komunitetin e Gjej Pro, si të zgjidhni profesionistët e duhur, dhe si të rriteni si freelancer në Shqipëri.",
+    emptyState: "Postimet e blogut janë në punim e sipër. Kthehuni së shpejti.",
+    publishedFallback: "I publikuar",
+    readMore: "Lexo më shumë →",
+    dateLocale: "sq-AL",
+  },
+  en: {
+    metaTitle: `Blog | ${SITE.name}`,
+    metaDescription:
+      "Tips, guides and stories from the Gjej Pro community, for clients and professionals.",
+    kicker: "Blog",
+    heroTitle: "Stories, tips and guides.",
+    heroSubtitle:
+      "What's happening in the Gjej Pro community, how to choose the right professionals, and how to grow as a freelancer in Albania.",
+    emptyState: "Blog posts are on their way. Check back soon.",
+    publishedFallback: "Published",
+    readMore: "Read more →",
+    dateLocale: "en-GB",
+  },
 };
 
-export default async function BlogIndexPage() {
+type SearchParams = Promise<{ locale?: string }>;
+
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: SearchParams;
+}): Promise<Metadata> {
+  const { locale: localeParam } = await searchParams;
+  const locale = localeParam === "en" ? "en" : "sq";
+  const t = STRINGS[locale];
+  return {
+    title: t.metaTitle,
+    description: t.metaDescription,
+    alternates: { canonical: `${SITE.url}/blog`, types: { "application/rss+xml": `${SITE.url}/blog/rss.xml` } },
+  };
+}
+
+export default async function BlogIndexPage({
+  searchParams,
+}: {
+  searchParams: SearchParams;
+}) {
+  const { locale: localeParam } = await searchParams;
+  const locale = localeParam === "en" ? "en" : "sq";
+  const t = STRINGS[locale];
+  const q = locale === "en" ? "?locale=en" : "";
+
   const data = await serverApi.blogPosts();
   const posts = data?.results ?? [];
 
   return (
     <>
-      <PublicHeader />
+      <PublicHeader locale={locale} />
       <main className="flex-1">
         <section className="bg-gradient-warm">
           <div className="max-w-4xl mx-auto px-6 sm:px-8 py-16 sm:py-20">
-            <p className="text-xs uppercase tracking-wider text-stone">Blog</p>
+            <p className="text-xs uppercase tracking-wider text-stone">{t.kicker}</p>
             <h1 className="font-display text-5xl mt-3 text-ink leading-[1.05]">
-              Histori, këshilla dhe udhëzues.
+              {t.heroTitle}
             </h1>
             <p className="mt-4 text-base text-ink-muted max-w-2xl">
-              Çfarë po ndodh në komunitetin e Gjej Pro, si të zgjidhni
-              profesionistët e duhur, dhe si të rriteni si freelancer në
-              Shqipëri.
+              {t.heroSubtitle}
             </p>
           </div>
         </section>
@@ -37,7 +83,7 @@ export default async function BlogIndexPage() {
           {posts.length === 0 ? (
             <div className="card p-10 text-center">
               <p className="text-base text-ink-muted">
-                Postimet e blogut janë në punim e sipër. Kthehuni së shpejti.
+                {t.emptyState}
               </p>
             </div>
           ) : (
@@ -45,7 +91,7 @@ export default async function BlogIndexPage() {
               {posts.map((p) => (
                 <Link
                   key={p.id}
-                  href={`/blog/${p.slug}`}
+                  href={`/blog/${p.slug}${q}`}
                   className="card card-link block overflow-hidden"
                 >
                   <div className="grid grid-cols-1 sm:grid-cols-[200px_1fr] gap-0">
@@ -63,10 +109,10 @@ export default async function BlogIndexPage() {
                       <div className="text-[10px] uppercase tracking-wider text-stone numeric">
                         {p.published_at
                           ? new Date(p.published_at).toLocaleDateString(
-                              "sq-AL",
+                              t.dateLocale,
                               { day: "2-digit", month: "long", year: "numeric" },
                             )
-                          : "I publikuar"}{" "}
+                          : t.publishedFallback}{" "}
                         · {p.author_name}
                       </div>
                       <h2 className="mt-2 font-display text-2xl text-ink leading-tight">
@@ -78,7 +124,7 @@ export default async function BlogIndexPage() {
                         </p>
                       )}
                       <p className="mt-4 text-sm text-forest font-medium">
-                        Lexo më shumë →
+                        {t.readMore}
                       </p>
                     </div>
                   </div>
@@ -88,7 +134,7 @@ export default async function BlogIndexPage() {
           )}
         </section>
       </main>
-      <PublicFooter />
+      <PublicFooter locale={locale} />
     </>
   );
 }

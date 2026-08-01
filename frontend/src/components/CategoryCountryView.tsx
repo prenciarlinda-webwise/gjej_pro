@@ -25,11 +25,11 @@ export async function categoryCountryMetadata(
   slug: string,
 ): Promise<Metadata> {
   const cat = await getCategory(slug);
-  if (!cat) return { title: "Page not found" };
+  if (!cat) return { title: `Page not found | ${SITE.name}` };
   const name = cat.name_en || cat.name;
 
   const url = `${SITE.url}${country.pathPrefix}/${slug}`;
-  const title = `Albanian ${name} in ${country.inLabel}`;
+  const title = `Albanian ${name} in ${country.inLabel} | ${SITE.name}`;
   const description = `Find verified Albanian ${name} professionals in ${country.inLabel}. Compare prices, reviews, and service areas.`;
 
   const list = await serverApi.searchFreelancers({
@@ -143,7 +143,7 @@ export async function CategoryCountryView({
             </p>
             <div className="mt-6 flex flex-wrap gap-3">
               <Link
-                href={`/profesionistet?country=${country.apiCountry}&category=${cat.slug}`}
+                href={`/profesionistet?country=${country.apiCountry}&category=${cat.slug}&locale=en`}
               >
                 <Button variant="primary" size="lg">
                   Filter in detail →
@@ -204,7 +204,7 @@ export async function CategoryCountryView({
               {country.cities.map((city) => (
                 <li key={city.slug}>
                   <Link
-                    href={`/profesionistet?country=${country.apiCountry}&category=${cat.slug}&city=${encodeURIComponent(city.name)}`}
+                    href={`/profesionistet?country=${country.apiCountry}&category=${cat.slug}&city=${encodeURIComponent(city.name)}&locale=en`}
                     className="card card-link block px-4 py-3"
                   >
                     <span className="text-ink font-medium">{name}</span>{" "}

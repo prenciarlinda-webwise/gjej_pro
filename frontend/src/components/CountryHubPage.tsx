@@ -42,7 +42,7 @@ export async function CountryHubPage({ country }: { country: CountryConfig }) {
               0% platform commission. Free for professionals and clients.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <Link href={`/profesionistet?country=${country.apiCountry}`}>
+              <Link href={`/profesionistet?country=${country.apiCountry}&locale=en`}>
                 <Button variant="primary" size="lg">
                   See professionals →
                 </Button>

@@ -7,15 +7,21 @@ from rest_framework.generics import ListAPIView
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework_simplejwt.token_blacklist.models import (
+    BlacklistedToken,
+    OutstandingToken,
+)
 
-from .models import EmailVerificationToken, User
+from .models import EmailVerificationToken, PasswordResetToken, User
 from .serializers import (
+    ForgotPasswordSerializer,
     LoginSerializer,
     RegisterSerializer,
+    ResetPasswordConfirmSerializer,
     UserSerializer,
     tokens_for_user,
 )
-from .services import send_verification_email
+from .services import send_password_reset_email, send_verification_email
 
 
 class RegisterView(APIView):
@@ -129,6 +135,89 @@ class ResendVerificationView(APIView):
 
         send_verification_email(user)
         return Response({"detail": "Email i ri u dërgua."})
+
+
+class ForgotPasswordView(APIView):
+    """Always responds with the same generic message, whether or not the
+    email is registered, so the endpoint can't be used to enumerate accounts."""
+
+    permission_classes = (permissions.AllowAny,)
+
+    THROTTLE_SECONDS = 60
+    GENERIC_RESPONSE = {
+        "detail": "Nëse ky email ekziston, ju kemi dërguar një link për rivendosjen e fjalëkalimit.",
+    }
+
+    def post(self, request):
+        serializer = ForgotPasswordSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        email = serializer.validated_data["email"]
+
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            return Response(self.GENERIC_RESPONSE)
+
+        last = (
+            PasswordResetToken.objects
+            .filter(user=user)
+            .order_by("-created_at")
+            .first()
+        )
+        if last:
+            elapsed = (timezone.now() - last.created_at).total_seconds()
+            if elapsed < self.THROTTLE_SECONDS:
+                return Response(self.GENERIC_RESPONSE)
+
+        send_password_reset_email(user)
+        return Response(self.GENERIC_RESPONSE)
+
+
+class ResetPasswordConfirmView(APIView):
+    permission_classes = (permissions.AllowAny,)
+
+    def post(self, request):
+        token_value = (request.data.get("token") or "").strip()
+        if not token_value:
+            return Response(
+                {"detail": "Tokeni mungon."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            token = PasswordResetToken.objects.select_related("user").get(
+                token=token_value,
+            )
+        except PasswordResetToken.DoesNotExist:
+            return Response(
+                {"detail": "Linku është i pavlefshëm."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if token.is_consumed():
+            return Response(
+                {"detail": "Linku është përdorur tashmë."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if token.is_expired():
+            return Response(
+                {"detail": "Linku ka skaduar. Kërkoni një link të ri."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        serializer = ResetPasswordConfirmSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        user = token.user
+        user.set_password(serializer.validated_data["password"])
+        user.save(update_fields=["password", "updated_at"])
+        token.consume()
+
+        for outstanding in OutstandingToken.objects.filter(user=user):
+            BlacklistedToken.objects.get_or_create(token=outstanding)
+
+        return Response({"detail": "Fjalëkalimi u ndryshua me sukses."})
 
 
 class IsAdmin(permissions.BasePermission):

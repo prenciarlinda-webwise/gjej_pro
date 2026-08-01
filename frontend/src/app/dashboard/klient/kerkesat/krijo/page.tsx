@@ -6,6 +6,8 @@ import { useEffect, useState } from "react";
 import { api, ApiError, type Category } from "@/lib/api";
 import { Button } from "@/components/Button";
 import { Field, TextareaField } from "@/components/Field";
+import { RateWarningBanner } from "@/components/RateWarningBanner";
+import { isBelowMarket, useRateBenchmark } from "@/lib/use-rate-benchmark";
 
 const CURRENCIES = ["ALL", "EUR", "USD", "GBP"];
 
@@ -50,6 +52,17 @@ export default function CreateJobPage() {
   function update<K extends keyof typeof form>(key: K, value: (typeof form)[K]) {
     setForm((f) => ({ ...f, [key]: value }));
   }
+
+  const selectedCategory = categories.find((c) => c.id === form.category_id);
+  const { benchmark } = useRateBenchmark({
+    category: selectedCategory?.slug,
+    city: form.city.trim() || undefined,
+    currency: form.currency,
+  });
+  const showRateWarning = isBelowMarket(
+    form.budget_max || form.budget_min,
+    benchmark,
+  );
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -189,6 +202,8 @@ export default function CreateJobPage() {
             </select>
           </div>
         </div>
+
+        {showRateWarning && <RateWarningBanner />}
 
         <div className="flex items-center gap-3 pt-3 border-t border-line">
           <Button type="submit" variant="primary" disabled={submitting}>

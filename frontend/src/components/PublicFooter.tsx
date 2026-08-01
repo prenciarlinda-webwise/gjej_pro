@@ -94,6 +94,8 @@ export function PublicFooter({
     isEn ? `${country!.pathPrefix}/qytete/${slug}` : `/qytete/${slug}`;
   const seeAllCitiesHref = isEn ? `${country!.pathPrefix}/qytete` : "/qytete";
 
+  const q = locale === "en" ? "?locale=en" : "";
+
   return (
     <footer className="border-t border-line bg-surface mt-16">
       <div className="max-w-6xl mx-auto px-6 sm:px-8 py-12 grid grid-cols-2 sm:grid-cols-4 gap-8">
@@ -162,27 +164,27 @@ export function PublicFooter({
           </h4>
           <ul className="mt-3 space-y-2 text-sm">
             <li>
-              <Link href="/si-funksionon" className="text-ink hover:text-forest">
+              <Link href={`/si-funksionon${q}`} className="text-ink hover:text-forest">
                 {t.howItWorks}
               </Link>
             </li>
             <li>
-              <Link href="/per-profesionistet" className="text-ink hover:text-forest">
+              <Link href={`/per-profesionistet${q}`} className="text-ink hover:text-forest">
                 {t.forProfessionals}
               </Link>
             </li>
             <li>
-              <Link href="/rreth-nesh" className="text-ink hover:text-forest">
+              <Link href={`/rreth-nesh${q}`} className="text-ink hover:text-forest">
                 {t.aboutUs}
               </Link>
             </li>
             <li>
-              <Link href="/blog" className="text-ink hover:text-forest">
+              <Link href={`/blog${q}`} className="text-ink hover:text-forest">
                 {t.blog}
               </Link>
             </li>
             <li>
-              <Link href="/pyetjet-e-shpeshta" className="text-ink hover:text-forest">
+              <Link href={`/pyetjet-e-shpeshta${q}`} className="text-ink hover:text-forest">
                 {t.faq}
               </Link>
             </li>

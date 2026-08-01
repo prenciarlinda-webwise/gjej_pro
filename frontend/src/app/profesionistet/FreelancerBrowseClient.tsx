@@ -8,13 +8,14 @@ import {
   type FreelancerListItem,
   type PaginatedResponse,
 } from "@/lib/api";
-import { PublicHeader } from "@/components/PublicHeader";
+import { PublicHeader, type UiLocale } from "@/components/PublicHeader";
 import { PublicFooter } from "@/components/PublicFooter";
 import { FreelancerCard } from "@/components/FreelancerCard";
 import { Field } from "@/components/Field";
 import { Button } from "@/components/Button";
 import { HeroDecoration } from "@/components/HeroDecoration";
 import { MapView, type MapPin } from "@/components/MapView";
+import { COUNTRIES, type CountryConfig } from "@/lib/countries";
 
 const ALBANIAN_CITIES: { slug: string; name: string }[] = [
   { slug: "tirane", name: "Tiranë" },
@@ -27,6 +28,97 @@ const ALBANIAN_CITIES: { slug: string; name: string }[] = [
   { slug: "berat", name: "Berat" },
   { slug: "sarande", name: "Sarandë" },
 ];
+
+const STRINGS: Record<UiLocale, {
+  kicker: string;
+  title: string;
+  titleInCountry: (country: CountryConfig) => string;
+  subtitle: string;
+  search: string;
+  searchPlaceholder: string;
+  nearMe: string;
+  useMyLocation: string;
+  locating: string;
+  locationHint: string;
+  locationActive: string;
+  radius: (km: number) => string;
+  removeProximity: string;
+  category: string;
+  all: string;
+  city: string;
+  verifiedOnly: string;
+  clearFilters: string;
+  results: (n: number) => string;
+  withinKm: (km: number) => string;
+  emptyState: string;
+  previous: string;
+  next: string;
+  page: (n: number) => string;
+  geoUnsupported: string;
+  geoDenied: string;
+  geoFailed: string;
+}> = {
+  sq: {
+    kicker: "Profesionistët",
+    title: "Profesionistë në Shqipëri",
+    titleInCountry: (c) => `Profesionistë shqiptarë në ${c.label}`,
+    subtitle:
+      "Filtroni sipas kategorisë, qytetit, vlerësimit, ose gjeni profesionistë pranë vendndodhjes suaj.",
+    search: "Kërko",
+    searchPlaceholder: "Emër, kategori, fjalë kyçe…",
+    nearMe: "Pranë meje",
+    useMyLocation: "📍 Përdor vendndodhjen time",
+    locating: "Po lexohet…",
+    locationHint: "Shfletuesi do të kërkojë leje për të ndarë vendndodhjen.",
+    locationActive: "✓ Vendndodhja aktive",
+    radius: (km) => `Rrezja: ${km} km`,
+    removeProximity: "Hiqe filtrin e afërsisë",
+    category: "Kategoria",
+    all: "Të gjitha",
+    city: "Qyteti",
+    verifiedOnly: "Vetëm të verifikuar",
+    clearFilters: "Pastro filtrat",
+    results: (n) => `${n} rezultate`,
+    withinKm: (km) => `Brenda ${km} km nga ju`,
+    emptyState: "Asnjë profesionist nuk u gjet. Provoni filtra të tjerë ose rritni rrezen e kërkimit.",
+    previous: "← E mëparshme",
+    next: "E ardhshme →",
+    page: (n) => `Faqja ${n}`,
+    geoUnsupported: "Shfletuesi nuk mbështet vendndodhjen.",
+    geoDenied: "Lejimi i vendndodhjes u mohua.",
+    geoFailed: "Nuk arritëm të lexojmë vendndodhjen tuaj.",
+  },
+  en: {
+    kicker: "Professionals",
+    title: "Albanian professionals",
+    titleInCountry: (c) => `Albanian professionals in ${c.inLabel}`,
+    subtitle:
+      "Filter by category, city, rating, or find professionals near your location.",
+    search: "Search",
+    searchPlaceholder: "Name, category, keyword…",
+    nearMe: "Near me",
+    useMyLocation: "📍 Use my location",
+    locating: "Locating…",
+    locationHint: "Your browser will ask for permission to share your location.",
+    locationActive: "✓ Location active",
+    radius: (km) => `Radius: ${km} km`,
+    removeProximity: "Remove proximity filter",
+    category: "Category",
+    all: "All",
+    city: "City",
+    verifiedOnly: "Verified only",
+    clearFilters: "Clear filters",
+    results: (n) => `${n} ${n === 1 ? "result" : "results"}`,
+    withinKm: (km) => `Within ${km} km of you`,
+    emptyState: "No professional found. Try different filters or widen the search radius.",
+    previous: "← Previous",
+    next: "Next →",
+    page: (n) => `Page ${n}`,
+    geoUnsupported: "Your browser doesn't support location.",
+    geoDenied: "Location permission was denied.",
+    geoFailed: "We couldn't read your location.",
+  },
+};
 
 interface Coords {
   lat: number;
@@ -45,6 +137,15 @@ function FreelancerBrowse() {
   const router = useRouter();
   const pathname = usePathname();
   const sp = useSearchParams();
+
+  const locale: UiLocale = sp.get("locale") === "en" ? "en" : "sq";
+  const t = STRINGS[locale];
+  const apiCountry = sp.get("country") ?? "";
+  const countryConfig = apiCountry
+    ? Object.values(COUNTRIES).find((c) => c.apiCountry === apiCountry)
+    : undefined;
+  const cityOptions = countryConfig ? countryConfig.cities : ALBANIAN_CITIES;
+  const pageTitle = countryConfig ? t.titleInCountry(countryConfig) : t.title;
 
   const [categories, setCategories] = useState<Category[]>([]);
   const [results, setResults] = useState<PaginatedResponse<FreelancerListItem> | null>(null);
@@ -70,6 +171,7 @@ function FreelancerBrowse() {
         q,
         category,
         city,
+        country: apiCountry || undefined,
         verified,
         lat: coords?.lat,
         lng: coords?.lng,
@@ -78,7 +180,7 @@ function FreelancerBrowse() {
       })
       .then((r) => setResults(r))
       .finally(() => setLoading(false));
-  }, [q, category, city, verified, coords, radiusKm, page]);
+  }, [q, category, city, apiCountry, verified, coords, radiusKm, page]);
 
   // Keep the URL in sync with the active filters so the page is shareable.
   useEffect(() => {
@@ -86,11 +188,13 @@ function FreelancerBrowse() {
     if (q) params.set("q", q);
     if (category) params.set("category", category);
     if (city) params.set("city", city);
+    if (apiCountry) params.set("country", apiCountry);
     if (verified) params.set("verified", "1");
     if (page > 1) params.set("page", String(page));
+    if (locale === "en") params.set("locale", "en");
     const qs = params.toString();
     router.replace(`${pathname}${qs ? "?" + qs : ""}`, { scroll: false });
-  }, [q, category, city, verified, page, router, pathname]);
+  }, [q, category, city, apiCountry, verified, page, locale, router, pathname]);
 
   function clearFilters() {
     setQ("");
@@ -104,7 +208,7 @@ function FreelancerBrowse() {
 
   async function requestLocation() {
     if (!("geolocation" in navigator)) {
-      setCoordsError("Shfletuesi nuk mbështet vendndodhjen.");
+      setCoordsError(t.geoUnsupported);
       return;
     }
     setRequestingLocation(true);
@@ -117,10 +221,7 @@ function FreelancerBrowse() {
         setRequestingLocation(false);
       },
       (err) => {
-        const msg =
-          err.code === err.PERMISSION_DENIED
-            ? "Lejimi i vendndodhjes u mohua."
-            : "Nuk arritëm të lexojmë vendndodhjen tuaj.";
+        const msg = err.code === err.PERMISSION_DENIED ? t.geoDenied : t.geoFailed;
         setCoordsError(msg);
         setRequestingLocation(false);
       },
@@ -132,30 +233,29 @@ function FreelancerBrowse() {
 
   return (
     <>
-      <PublicHeader />
+      <PublicHeader locale={locale} />
       <main className="flex-1">
         <section className="relative overflow-hidden">
           <HeroDecoration variant="warm" />
           <div className="relative max-w-6xl mx-auto px-6 sm:px-8 py-12 sm:py-16">
             <p className="text-xs uppercase tracking-wider text-stone">
-              Profesionistët
+              {t.kicker}
             </p>
             <h1 className="font-display text-4xl sm:text-5xl mt-2 text-ink leading-[1.05]">
-              Profesionistë në Shqipëri
+              {pageTitle}
             </h1>
             <p className="mt-3 text-base text-ink-muted max-w-2xl">
-              Filtroni sipas kategorisë, qytetit, vlerësimit, ose gjeni
-              profesionistë pranë vendndodhjes suaj.
+              {t.subtitle}
             </p>
             <div className="mt-6 max-w-xl">
               <Field
-                label="Kërko"
+                label={t.search}
                 value={q}
                 onChange={(e) => {
                   setQ(e.target.value);
                   setPage(1);
                 }}
-                placeholder="Emër, kategori, fjalë kyçe…"
+                placeholder={t.searchPlaceholder}
               />
             </div>
           </div>
@@ -166,7 +266,7 @@ function FreelancerBrowse() {
             <div className="card p-5 space-y-4">
               <div>
                 <div className="text-xs font-medium uppercase tracking-wider text-ink-muted">
-                  Pranë meje
+                  {t.nearMe}
                 </div>
                 {!coords ? (
                   <>
@@ -177,23 +277,23 @@ function FreelancerBrowse() {
                       disabled={requestingLocation}
                       className="mt-2 w-full"
                     >
-                      {requestingLocation ? "Po lexohet…" : "📍 Përdor vendndodhjen time"}
+                      {requestingLocation ? t.locating : t.useMyLocation}
                     </Button>
                     {coordsError && (
                       <p className="mt-2 text-xs text-danger">{coordsError}</p>
                     )}
                     <p className="mt-2 text-[11px] text-stone leading-snug">
-                      Shfletuesi do të kërkojë leje për të ndarë vendndodhjen.
+                      {t.locationHint}
                     </p>
                   </>
                 ) : (
                   <>
                     <div className="mt-2 text-xs text-emerald font-medium">
-                      ✓ Vendndodhja aktive
+                      {t.locationActive}
                     </div>
                     <label className="mt-3 block">
                       <span className="text-[10px] uppercase tracking-wider text-stone">
-                        Rrezja: {radiusKm} km
+                        {t.radius(radiusKm)}
                       </span>
                       <input
                         type="range"
@@ -217,14 +317,14 @@ function FreelancerBrowse() {
                       }}
                       className="mt-1 text-danger"
                     >
-                      Hiqe filtrin e afërsisë
+                      {t.removeProximity}
                     </Button>
                   </>
                 )}
               </div>
             </div>
 
-            <FilterGroup label="Kategoria">
+            <FilterGroup label={t.category}>
               <select
                 value={category}
                 onChange={(e) => {
@@ -233,14 +333,16 @@ function FreelancerBrowse() {
                 }}
                 className="w-full rounded-md border border-line bg-surface px-3 py-2 text-sm text-ink focus:outline-none focus:ring-2 focus:ring-forest/15"
               >
-                <option value="">Të gjitha</option>
+                <option value="">{t.all}</option>
                 {categories.map((c) => (
-                  <option key={c.id} value={c.slug}>{c.name}</option>
+                  <option key={c.id} value={c.slug}>
+                    {locale === "en" ? c.name_en || c.name : c.name}
+                  </option>
                 ))}
               </select>
             </FilterGroup>
 
-            <FilterGroup label="Qyteti">
+            <FilterGroup label={t.city}>
               <select
                 value={city}
                 onChange={(e) => {
@@ -253,8 +355,8 @@ function FreelancerBrowse() {
                 }}
                 className="w-full rounded-md border border-line bg-surface px-3 py-2 text-sm text-ink focus:outline-none focus:ring-2 focus:ring-forest/15"
               >
-                <option value="">Të gjitha</option>
-                {ALBANIAN_CITIES.map((c) => (
+                <option value="">{t.all}</option>
+                {cityOptions.map((c) => (
                   <option key={c.slug} value={c.slug}>{c.name}</option>
                 ))}
               </select>
@@ -269,12 +371,12 @@ function FreelancerBrowse() {
                   setPage(1);
                 }}
               />
-              Vetëm të verifikuar
+              {t.verifiedOnly}
             </label>
 
             {hasFilters && (
               <Button variant="ghost" size="sm" onClick={clearFilters}>
-                Pastro filtrat
+                {t.clearFilters}
               </Button>
             )}
           </aside>
@@ -282,11 +384,11 @@ function FreelancerBrowse() {
           <div>
             <div className="flex items-baseline justify-between">
               <span className="text-xs uppercase tracking-wider text-stone numeric">
-                {loading ? "…" : `${results?.count ?? 0} rezultate`}
+                {loading ? "…" : t.results(results?.count ?? 0)}
               </span>
               {coords && (
                 <span className="text-xs text-stone">
-                  Brenda {radiusKm} km nga ju
+                  {t.withinKm(radiusKm)}
                 </span>
               )}
             </div>
@@ -296,7 +398,11 @@ function FreelancerBrowse() {
                 pins={(results?.results ?? []).map<MapPin>((f) => ({
                   id: f.id,
                   name: f.full_name,
-                  subtitle: f.headline || f.categories[0]?.name,
+                  subtitle:
+                    f.headline ||
+                    (locale === "en"
+                      ? f.categories[0]?.name_en || f.categories[0]?.name
+                      : f.categories[0]?.name),
                   city: f.cities[0],
                 }))}
                 userCoords={coords}
@@ -306,16 +412,13 @@ function FreelancerBrowse() {
 
             <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
               {results?.results.map((f) => (
-                <FreelancerCard key={f.id} f={f} />
+                <FreelancerCard key={f.id} f={f} locale={locale} />
               ))}
             </div>
 
             {!loading && results?.results.length === 0 && (
               <div className="mt-8 card p-10 text-center">
-                <p className="text-sm text-ink-muted">
-                  Asnjë profesionist nuk u gjet. Provoni filtra të tjerë ose
-                  rritni rrezen e kërkimit.
-                </p>
+                <p className="text-sm text-ink-muted">{t.emptyState}</p>
               </div>
             )}
 
@@ -327,23 +430,23 @@ function FreelancerBrowse() {
                   disabled={!results.previous}
                   onClick={() => setPage((p) => Math.max(1, p - 1))}
                 >
-                  ← E mëparshme
+                  {t.previous}
                 </Button>
-                <span className="text-stone numeric">Faqja {page}</span>
+                <span className="text-stone numeric">{t.page(page)}</span>
                 <Button
                   variant="secondary"
                   size="sm"
                   disabled={!results.next}
                   onClick={() => setPage((p) => p + 1)}
                 >
-                  E ardhshme →
+                  {t.next}
                 </Button>
               </div>
             )}
           </div>
         </section>
       </main>
-      <PublicFooter />
+      <PublicFooter locale={locale} country={countryConfig} />
     </>
   );
 }

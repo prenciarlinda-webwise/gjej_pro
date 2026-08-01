@@ -6,14 +6,67 @@ import { PublicFooter } from "@/components/PublicFooter";
 import { PublicHeader } from "@/components/PublicHeader";
 import { serverApi, SITE } from "@/lib/server-api";
 
-export const metadata: Metadata = {
-  title: `Kategoritë e shërbimeve | ${SITE.name}`,
-  description:
-    "Të gjitha kategoritë e shërbimeve në Gjej Pro: elektricistë, hidraulikë, bravandreqës, mjeshtra ndërtimi, pastrim shtëpie, dhe shumë të tjera.",
-  alternates: { canonical: `${SITE.url}/kategorite` },
+const STRINGS = {
+  sq: {
+    metaTitle: `Kategoritë e shërbimeve | ${SITE.name}`,
+    metaDescription:
+      "Të gjitha kategoritë e shërbimeve në Gjej Pro: elektricistë, hidraulikë, bravandreqës, mjeshtra ndërtimi, pastrim shtëpie, dhe shumë të tjera.",
+    kicker: "Kategoritë",
+    titlePre: "Çfarë po kërkoni",
+    titleEm: "sot?",
+    subtitle: (count: number, pros: number) =>
+      `${count}+ kategori shërbimesh. ${pros} profesionistë të verifikuar gati t'ju ndihmojnë.`,
+    browseAll: "Shfleto të gjithë profesionistët →",
+    postRequest: "Posto një kërkesë",
+    notFoundTitle: "Nuk e gjeni kategorinë tuaj?",
+    notFoundBody:
+      "Po shtojmë kategori të reja vazhdimisht. Postoni kërkesën tuaj dhe do t'ju gjejmë profesionistin e duhur.",
+  },
+  en: {
+    metaTitle: `Service categories | ${SITE.name}`,
+    metaDescription:
+      "All service categories on Gjej Pro: electricians, plumbers, locksmiths, construction, home cleaning, and many more.",
+    kicker: "Categories",
+    titlePre: "What are you looking for",
+    titleEm: "today?",
+    subtitle: (count: number, pros: number) =>
+      `${count}+ service categories. ${pros} verified professionals ready to help.`,
+    browseAll: "Browse all professionals →",
+    postRequest: "Post a request",
+    notFoundTitle: "Can't find your category?",
+    notFoundBody:
+      "We're adding new categories all the time. Post your request and we'll find you the right professional.",
+  },
 };
 
-export default async function CategoriesIndexPage() {
+type SearchParams = Promise<{ locale?: string }>;
+
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: SearchParams;
+}): Promise<Metadata> {
+  const { locale: localeParam } = await searchParams;
+  const locale = localeParam === "en" ? "en" : "sq";
+  const t = STRINGS[locale];
+  return {
+    title: t.metaTitle,
+    description: t.metaDescription,
+    alternates: { canonical: `${SITE.url}/kategorite` },
+  };
+}
+
+export default async function CategoriesIndexPage({
+  searchParams,
+}: {
+  searchParams: SearchParams;
+}) {
+  const { locale: localeParam } = await searchParams;
+  const locale = localeParam === "en" ? "en" : "sq";
+  const t = STRINGS[locale];
+  const q = locale === "en" ? "?locale=en" : "";
+  const qAmp = locale === "en" ? "&locale=en" : "";
+
   const categories = (await serverApi.categories()) ?? [];
   const totalPros = categories.reduce(
     (acc, c) => acc + (c.freelancer_count ?? 0),
@@ -22,7 +75,7 @@ export default async function CategoriesIndexPage() {
 
   return (
     <>
-      <PublicHeader />
+      <PublicHeader locale={locale} />
       <main className="flex-1">
         <section className="bg-gradient-warm relative overflow-hidden">
           {/* Decorative shapes */}
@@ -45,25 +98,23 @@ export default async function CategoriesIndexPage() {
 
           <div className="max-w-6xl mx-auto px-6 sm:px-8 py-16 sm:py-20 relative">
             <p className="text-xs uppercase tracking-wider text-stone">
-              Kategoritë
+              {t.kicker}
             </p>
             <h1 className="font-display text-5xl sm:text-6xl mt-3 text-ink leading-[1.05] max-w-3xl">
-              Çfarë po kërkoni{" "}
-              <span className="italic text-forest">sot?</span>
+              {t.titlePre} <span className="italic text-forest">{t.titleEm}</span>
             </h1>
             <p className="mt-5 text-lg text-ink-muted max-w-2xl leading-relaxed">
-              {categories.length}+ kategori shërbimesh. {totalPros} profesionistë
-              të verifikuar gati t&apos;ju ndihmojnë.
+              {t.subtitle(categories.length, totalPros)}
             </p>
             <div className="mt-7 flex flex-wrap gap-3">
-              <Link href="/profesionistet">
+              <Link href={`/profesionistet${q}`}>
                 <Button variant="primary" size="lg">
-                  Shfleto të gjithë profesionistët →
+                  {t.browseAll}
                 </Button>
               </Link>
-              <Link href="/regjistrohu?role=klient">
+              <Link href={`/regjistrohu?role=klient${qAmp}`}>
                 <Button variant="secondary" size="lg">
-                  Posto një kërkesë
+                  {t.postRequest}
                 </Button>
               </Link>
             </div>
@@ -80,6 +131,7 @@ export default async function CategoriesIndexPage() {
                 name_en={c.name_en}
                 icon={c.icon}
                 count={c.freelancer_count ?? 0}
+                locale={locale}
               />
             ))}
           </div>
@@ -88,27 +140,26 @@ export default async function CategoriesIndexPage() {
         <section className="bg-gradient-forest text-white">
           <div className="max-w-4xl mx-auto px-6 sm:px-8 py-14 text-center">
             <h2 className="font-display text-3xl sm:text-4xl">
-              Nuk e gjeni kategorinë tuaj?
+              {t.notFoundTitle}
             </h2>
             <p className="mt-3 text-white/80 max-w-2xl mx-auto">
-              Po shtojmë kategori të reja vazhdimisht. Postoni kërkesën tuaj
-              dhe do t&apos;ju gjejmë profesionistin e duhur.
+              {t.notFoundBody}
             </p>
             <div className="mt-6 flex flex-wrap justify-center gap-2">
-              <Link href="/regjistrohu?role=klient">
+              <Link href={`/regjistrohu?role=klient${qAmp}`}>
                 <Button
                   variant="primary"
                   size="lg"
                   className="bg-white text-forest hover:bg-white/90"
                 >
-                  Posto një kërkesë
+                  {t.postRequest}
                 </Button>
               </Link>
             </div>
           </div>
         </section>
       </main>
-      <PublicFooter />
+      <PublicFooter locale={locale} />
     </>
   );
 }

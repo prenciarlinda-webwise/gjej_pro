@@ -9,25 +9,82 @@ import { JsonLd } from "@/components/JsonLd";
 import { breadcrumbSchema, freelancerSchema } from "@/lib/structured-data";
 import { serverApi, SITE } from "@/lib/server-api";
 
+const STRINGS = {
+  sq: {
+    notFoundTitle: `Profesionisti nuk u gjet | ${SITE.name}`,
+    defaultDescription: `Profesionist i listuar në ${SITE.name}.`,
+    dateLocale: "sq-AL",
+    backToList: "← Të gjithë profesionistët",
+    verifiedBadge: "Profesionist i verifikuar",
+    statRate: "Tarifa",
+    statExperience: "Eksperiencë",
+    statRating: "Vlerësimi",
+    statMemberSince: "Anëtar që",
+    quoteBasedPrice: "Çmim me ofertë",
+    perHourSuffix: "/orë",
+    years: (n: number) => `${n} vjet`,
+    noRating: "Pa vlerësime",
+    aboutTitle: "Rreth",
+    reviewsTitle: (n: number) => `Vlerësimet (${n})`,
+    noReviewsYet: "Ende pa vlerësime.",
+    reviewCount: (n: number) => `${n} ${n === 1 ? "vlerësim" : "vlerësime"}`,
+    servicesTitle: (n: number) => `Shërbimet (${n})`,
+    noServicesYet: "Ende nuk janë listuar shërbime.",
+    serviceQuoteBased: "Me ofertë",
+    serviceAreasTitle: "Zonat e punës",
+    noServiceAreas: "Pa specifikuar.",
+  },
+  en: {
+    notFoundTitle: `Professional not found | ${SITE.name}`,
+    defaultDescription: `Professional listed on ${SITE.name}.`,
+    dateLocale: "en-GB",
+    backToList: "← All professionals",
+    verifiedBadge: "Verified professional",
+    statRate: "Rate",
+    statExperience: "Experience",
+    statRating: "Rating",
+    statMemberSince: "Member since",
+    quoteBasedPrice: "Quote-based price",
+    perHourSuffix: "/hr",
+    years: (n: number) => `${n} ${n === 1 ? "yr" : "yrs"}`,
+    noRating: "No reviews",
+    aboutTitle: "About",
+    reviewsTitle: (n: number) => `Reviews (${n})`,
+    noReviewsYet: "No reviews yet.",
+    reviewCount: (n: number) => `${n} ${n === 1 ? "review" : "reviews"}`,
+    servicesTitle: (n: number) => `Services (${n})`,
+    noServicesYet: "No services listed yet.",
+    serviceQuoteBased: "Quote-based",
+    serviceAreasTitle: "Service areas",
+    noServiceAreas: "Not specified.",
+  },
+};
+
 interface RouteParams {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<{ locale?: string }>;
 }
 
-export async function generateMetadata({ params }: RouteParams): Promise<Metadata> {
+export async function generateMetadata({ params, searchParams }: RouteParams): Promise<Metadata> {
   const { slug } = await params;
+  const { locale: localeParam } = await searchParams;
+  const locale = localeParam === "en" ? "en" : "sq";
+  const t = STRINGS[locale];
   const userId = await serverApi.resolveFreelancerSlug(slug);
   if (!userId) {
-    return { title: `Profesionisti nuk u gjet | ${SITE.name}` };
+    return { title: t.notFoundTitle };
   }
   const profile = await serverApi.freelancer(userId);
   if (!profile) {
-    return { title: `Profesionisti nuk u gjet | ${SITE.name}` };
+    return { title: t.notFoundTitle };
   }
   const canonical = `${SITE.url}/profesionist/${profile.slug}`;
-  const cats = profile.categories.map((c) => c.name).join(", ");
+  const catName = (c: { name: string; name_en: string }) =>
+    locale === "en" ? c.name_en || c.name : c.name;
+  const cats = profile.categories.map(catName).join(", ");
   const title = `${profile.full_name}${profile.headline ? " | " + profile.headline : ""} | ${SITE.name}`;
   const description =
-    (profile.bio || profile.headline || `Profesionist i listuar në ${SITE.name}.`)
+    (profile.bio || profile.headline || t.defaultDescription)
       .replace(/\s+/g, " ")
       .slice(0, 160);
   return {
@@ -39,15 +96,19 @@ export async function generateMetadata({ params }: RouteParams): Promise<Metadat
       description,
       url: canonical,
       siteName: SITE.name,
-      locale: "sq_AL",
+      locale: locale === "en" ? "en_US" : "sq_AL",
       type: "profile",
     },
-    keywords: [profile.full_name, ...profile.categories.map((c) => c.name), cats],
+    keywords: [profile.full_name, ...profile.categories.map(catName), cats],
   };
 }
 
-export default async function FreelancerDetailPage({ params }: RouteParams) {
+export default async function FreelancerDetailPage({ params, searchParams }: RouteParams) {
   const { slug } = await params;
+  const { locale: localeParam } = await searchParams;
+  const locale = localeParam === "en" ? "en" : "sq";
+  const t = STRINGS[locale];
+  const q = locale === "en" ? "?locale=en" : "";
   const userId = await serverApi.resolveFreelancerSlug(slug);
   if (!userId) {
     notFound();
@@ -63,8 +124,8 @@ export default async function FreelancerDetailPage({ params }: RouteParams) {
 
   const rate =
     profile.hourly_rate_min || profile.hourly_rate_max
-      ? `${profile.hourly_rate_min ?? "?"} – ${profile.hourly_rate_max ?? "?"} ${profile.currency}/orë`
-      : "Çmim me ofertë";
+      ? `${profile.hourly_rate_min ?? "?"} – ${profile.hourly_rate_max ?? "?"} ${profile.currency}${t.perHourSuffix}`
+      : t.quoteBasedPrice;
 
   return (
     <>
@@ -81,15 +142,15 @@ export default async function FreelancerDetailPage({ params }: RouteParams) {
           ]),
         ]}
       />
-      <PublicHeader />
+      <PublicHeader locale={locale} />
       <main className="flex-1">
         <section className="border-b border-line bg-surface">
           <div className="max-w-4xl mx-auto px-6 sm:px-8 py-12">
             <Link
-              href="/profesionistet"
+              href={`/profesionistet${q}`}
               className="text-xs text-stone hover:text-ink"
             >
-              ← Të gjithë profesionistët
+              {t.backToList}
             </Link>
 
             <div className="mt-4 flex items-start justify-between gap-4 flex-wrap">
@@ -106,32 +167,32 @@ export default async function FreelancerDetailPage({ params }: RouteParams) {
               </div>
               {profile.is_verified && (
                 <span className="inline-flex items-center gap-1 text-xs uppercase tracking-wider text-gold border border-gold/40 bg-gold/10 rounded px-2.5 py-1">
-                  ✓ Profesionist i verifikuar
+                  ✓ {t.verifiedBadge}
                 </span>
               )}
             </div>
 
             <div className="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-px bg-line border border-line rounded-lg overflow-hidden">
-              <Stat label="Tarifa" value={rate} />
+              <Stat label={t.statRate} value={rate} />
               <Stat
-                label="Eksperiencë"
+                label={t.statExperience}
                 value={
                   profile.years_experience !== null && profile.years_experience !== undefined
-                    ? `${profile.years_experience} vjet`
+                    ? t.years(profile.years_experience)
                     : "—"
                 }
               />
               <Stat
-                label="Vlerësimi"
+                label={t.statRating}
                 value={
                   profile.review_count > 0
                     ? `★ ${profile.avg_rating} (${profile.review_count})`
-                    : "Pa vlerësime"
+                    : t.noRating
                 }
               />
               <Stat
-                label="Anëtar që"
-                value={new Date(profile.member_since).toLocaleDateString("sq-AL", {
+                label={t.statMemberSince}
+                value={new Date(profile.member_since).toLocaleDateString(t.dateLocale, {
                   year: "numeric",
                   month: "short",
                 })}
@@ -142,6 +203,7 @@ export default async function FreelancerDetailPage({ params }: RouteParams) {
               <ContactProfessionalButton
                 freelancerUserId={userId}
                 freelancerSlug={profile.slug}
+                locale={locale}
               />
             </div>
           </div>
@@ -150,16 +212,16 @@ export default async function FreelancerDetailPage({ params }: RouteParams) {
         <section className="max-w-4xl mx-auto px-6 sm:px-8 py-10 grid grid-cols-1 md:grid-cols-3 gap-8">
           <div className="md:col-span-2 space-y-8">
             {profile.bio && (
-              <Block title="Rreth">
+              <Block title={t.aboutTitle}>
                 <p className="text-sm text-ink leading-relaxed whitespace-pre-line">
                   {profile.bio}
                 </p>
               </Block>
             )}
 
-            <Block title={`Vlerësimet (${profile.review_count})`}>
+            <Block title={t.reviewsTitle(profile.review_count)}>
               {profile.review_count === 0 ? (
-                <p className="text-sm text-stone">Ende pa vlerësime.</p>
+                <p className="text-sm text-stone">{t.noReviewsYet}</p>
               ) : (
                 <>
                   <div className="flex items-baseline gap-3 mb-4">
@@ -171,8 +233,7 @@ export default async function FreelancerDetailPage({ params }: RouteParams) {
                       size={18}
                     />
                     <span className="text-sm text-stone numeric">
-                      · {profile.review_count}{" "}
-                      {profile.review_count === 1 ? "vlerësim" : "vlerësime"}
+                      · {t.reviewCount(profile.review_count)}
                     </span>
                   </div>
                   <ul className="space-y-3">
@@ -189,7 +250,7 @@ export default async function FreelancerDetailPage({ params }: RouteParams) {
                             </span>
                           </div>
                           <span className="text-xs text-stone numeric">
-                            {new Date(r.created_at).toLocaleDateString("sq-AL", {
+                            {new Date(r.created_at).toLocaleDateString(t.dateLocale, {
                               day: "2-digit", month: "short", year: "numeric",
                             })}
                           </span>
@@ -209,15 +270,15 @@ export default async function FreelancerDetailPage({ params }: RouteParams) {
               )}
             </Block>
 
-            <Block title={`Shërbimet (${profile.services.length})`}>
+            <Block title={t.servicesTitle(profile.services.length)}>
               {profile.services.length === 0 ? (
-                <p className="text-sm text-stone">Ende nuk janë listuar shërbime.</p>
+                <p className="text-sm text-stone">{t.noServicesYet}</p>
               ) : (
                 <ul className="space-y-3">
                   {profile.services.filter((s) => s.is_active).map((s) => {
                     const sPrice =
                       s.pricing_model === "quote"
-                        ? "Me ofertë"
+                        ? t.serviceQuoteBased
                         : s.price_min || s.price_max
                         ? `${s.price_min ?? "?"} – ${s.price_max ?? "?"} ${s.currency}`
                         : "—";
@@ -230,10 +291,10 @@ export default async function FreelancerDetailPage({ params }: RouteParams) {
                           <div className="min-w-0">
                             <div className="text-[10px] uppercase tracking-wider text-stone">
                               <Link
-                                href={`/${s.category.slug}`}
+                                href={`/${s.category.slug}${q}`}
                                 className="hover:text-ink"
                               >
-                                {s.category.name}
+                                {locale === "en" ? s.category.name_en || s.category.name : s.category.name}
                               </Link>
                             </div>
                             <h4 className="mt-0.5 font-medium text-ink">
@@ -258,9 +319,9 @@ export default async function FreelancerDetailPage({ params }: RouteParams) {
           </div>
 
           <aside className="space-y-6">
-            <Block title="Zonat e punës">
+            <Block title={t.serviceAreasTitle}>
               {profile.service_areas.length === 0 ? (
-                <p className="text-sm text-stone">Pa specifikuar.</p>
+                <p className="text-sm text-stone">{t.noServiceAreas}</p>
               ) : (
                 <ul className="flex flex-wrap gap-1.5">
                   {profile.service_areas.map((a) => (
@@ -277,7 +338,7 @@ export default async function FreelancerDetailPage({ params }: RouteParams) {
           </aside>
         </section>
       </main>
-      <PublicFooter />
+      <PublicFooter locale={locale} />
     </>
   );
 }

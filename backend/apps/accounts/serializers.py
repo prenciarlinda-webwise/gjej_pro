@@ -124,6 +124,21 @@ class LoginSerializer(serializers.Serializer):
         return attrs
 
 
+class ForgotPasswordSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+
+    def validate_email(self, value: str) -> str:
+        return value.lower().strip()
+
+
+class ResetPasswordConfirmSerializer(serializers.Serializer):
+    password = serializers.CharField(write_only=True, min_length=8)
+
+    def validate_password(self, value: str) -> str:
+        validate_password(value)
+        return value
+
+
 def tokens_for_user(user: User) -> dict:
     refresh = RefreshToken.for_user(user)
     return {

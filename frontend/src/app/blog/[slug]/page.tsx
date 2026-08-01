@@ -8,14 +8,33 @@ import { blogPostingSchema, breadcrumbSchema } from "@/lib/structured-data";
 import { MarkdownContent } from "@/components/MarkdownContent";
 import { serverApi, SITE } from "@/lib/server-api";
 
+const STRINGS = {
+  sq: {
+    notFoundTitle: `Postimi nuk u gjet | ${SITE.name}`,
+    backToBlog: "← Të gjitha postimet",
+    publishedFallback: "I publikuar",
+    dateLocale: "sq-AL",
+  },
+  en: {
+    notFoundTitle: `Post not found | ${SITE.name}`,
+    backToBlog: "← All posts",
+    publishedFallback: "Published",
+    dateLocale: "en-GB",
+  },
+};
+
 interface RouteParams {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<{ locale?: string }>;
 }
 
-export async function generateMetadata({ params }: RouteParams): Promise<Metadata> {
+export async function generateMetadata({ params, searchParams }: RouteParams): Promise<Metadata> {
   const { slug } = await params;
+  const { locale: localeParam } = await searchParams;
+  const locale = localeParam === "en" ? "en" : "sq";
+  const t = STRINGS[locale];
   const post = await serverApi.blogPost(slug);
-  if (!post) return { title: `Postimi nuk u gjet | ${SITE.name}` };
+  if (!post) return { title: t.notFoundTitle };
   return {
     title: `${post.title} | ${SITE.name} Blog`,
     description: (post.excerpt || post.body).slice(0, 160),
@@ -33,8 +52,12 @@ export async function generateMetadata({ params }: RouteParams): Promise<Metadat
   };
 }
 
-export default async function BlogPostPage({ params }: RouteParams) {
+export default async function BlogPostPage({ params, searchParams }: RouteParams) {
   const { slug } = await params;
+  const { locale: localeParam } = await searchParams;
+  const locale = localeParam === "en" ? "en" : "sq";
+  const t = STRINGS[locale];
+  const q = locale === "en" ? "?locale=en" : "";
   const post = await serverApi.blogPost(slug);
   if (!post) notFound();
 
@@ -50,20 +73,20 @@ export default async function BlogPostPage({ params }: RouteParams) {
           ]),
         ]}
       />
-      <PublicHeader />
+      <PublicHeader locale={locale} />
       <main className="flex-1">
         <article className="max-w-3xl mx-auto px-6 sm:px-8 py-12">
-          <Link href="/blog" className="text-xs text-stone hover:text-ink">
-            ← Të gjitha postimet
+          <Link href={`/blog${q}`} className="text-xs text-stone hover:text-ink">
+            {t.backToBlog}
           </Link>
 
           <div className="mt-4">
             <div className="text-[10px] uppercase tracking-wider text-stone numeric">
               {post.published_at
-                ? new Date(post.published_at).toLocaleDateString("sq-AL", {
+                ? new Date(post.published_at).toLocaleDateString(t.dateLocale, {
                     day: "2-digit", month: "long", year: "numeric",
                   })
-                : "I publikuar"}{" "}
+                : t.publishedFallback}{" "}
               · {post.author_name}
             </div>
             <h1 className="mt-3 font-display text-5xl text-ink leading-[1.05]">
@@ -90,7 +113,7 @@ export default async function BlogPostPage({ params }: RouteParams) {
           </div>
         </article>
       </main>
-      <PublicFooter />
+      <PublicFooter locale={locale} />
     </>
   );
 }

@@ -37,6 +37,7 @@ const HEADER_STRINGS: Record<UiLocale, {
 export function PublicHeader({ locale = "sq" }: { locale?: UiLocale }) {
   const { user, loading } = useAuth();
   const t = HEADER_STRINGS[locale];
+  const q = locale === "en" ? "?locale=en" : "";
   const loginHref = locale === "en" ? "/hyr?locale=en" : "/hyr";
   const signupHref = locale === "en" ? "/regjistrohu?locale=en" : "/regjistrohu";
 
@@ -45,17 +46,17 @@ export function PublicHeader({ locale = "sq" }: { locale?: UiLocale }) {
       <div className="max-w-6xl mx-auto px-6 sm:px-8 py-3 flex items-center justify-between gap-4">
         <Logo size={84} />
         <nav className="flex items-center gap-1.5 flex-wrap justify-end">
-          <Link href="/profesionistet" className="hidden sm:inline-block">
+          <Link href={`/profesionistet${q}`} className="hidden sm:inline-block">
             <Button variant="ghost" size="md">
               {t.professionals}
             </Button>
           </Link>
-          <Link href="/kategorite" className="hidden md:inline-block">
+          <Link href={`/kategorite${q}`} className="hidden md:inline-block">
             <Button variant="ghost" size="md">
               {t.categories}
             </Button>
           </Link>
-          <Link href="/si-funksionon" className="hidden md:inline-block">
+          <Link href={`/si-funksionon${q}`} className="hidden md:inline-block">
             <Button variant="ghost" size="md">
               {t.howItWorks}
             </Button>

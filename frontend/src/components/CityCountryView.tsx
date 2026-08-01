@@ -21,7 +21,7 @@ export function cityCountryIndexMetadata(country: CountryConfig): Metadata {
   const url = `${SITE.url}${country.pathPrefix}/qytete`;
   const cityNames = country.cities.map((c) => c.name).join(", ");
   return {
-    title: `Cities we cover in ${country.inLabel}`,
+    title: `Cities we cover in ${country.inLabel} | ${SITE.name}`,
     description: `Verified Albanian professionals in ${cityNames} and other cities in ${country.inLabel}.`,
     alternates: {
       canonical: url,
@@ -86,10 +86,10 @@ export async function cityCountryDetailMetadata(
   slug: string,
 ): Promise<Metadata> {
   const city = findCountryCityBySlug(country, slug);
-  if (!city) return { title: "City not found" };
+  if (!city) return { title: `City not found | ${SITE.name}` };
 
   const url = `${SITE.url}${country.pathPrefix}/qytete/${slug}`;
-  const title = `Albanian professionals in ${city.name}`;
+  const title = `Albanian professionals in ${city.name} | ${SITE.name}`;
   const description = `Electricians, plumbers, cleaners, and other verified Albanian professionals in ${city.name}, ${country.label}.`;
 
   const list = await serverApi.searchFreelancers({
@@ -180,7 +180,7 @@ export async function CityCountryDetailView({
             </p>
             <div className="mt-5">
               <Link
-                href={`/profesionistet?country=${country.apiCountry}&city=${encodeURIComponent(city.name)}`}
+                href={`/profesionistet?country=${country.apiCountry}&city=${encodeURIComponent(city.name)}&locale=en`}
               >
                 <Button variant="primary">Filter in detail →</Button>
               </Link>

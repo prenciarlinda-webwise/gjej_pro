@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { CategoryIcon } from "@/components/CategoryIcon";
+import type { UiLocale } from "@/components/PublicHeader";
 
 const TINTS = [
   { bg: "rgba(31, 77, 58, 0.08)",  fg: "#1F4D3A" }, // forest
@@ -24,10 +25,22 @@ interface Props {
   name_en?: string;
   icon: string;
   count?: number;
+  locale?: UiLocale;
 }
 
-export function CategoryTile({ slug, name, name_en, icon, count }: Props) {
+export function CategoryTile({ slug, name, name_en, icon, count, locale = "sq" }: Props) {
   const tint = tintFor(slug);
+  const isEn = locale === "en";
+  const heading = isEn ? name_en || name : name;
+  const countLabel = isEn
+    ? count
+      ? `${count} ${count === 1 ? "professional" : "professionals"}`
+      : "Be the first"
+    : count
+      ? `${count} ${count === 1 ? "profesionist" : "profesionistë"}`
+      : "Të jesh i pari";
+  const seeLabel = isEn ? "See →" : "Shih →";
+
   return (
     <Link
       href={`/${slug}`}
@@ -46,19 +59,15 @@ export function CategoryTile({ slug, name, name_en, icon, count }: Props) {
       </div>
 
       <h3 className="mt-5 font-display text-xl text-ink leading-tight">
-        {name}
+        {heading}
       </h3>
-      {name_en && (
+      {!isEn && name_en && (
         <p className="mt-1 text-xs text-stone italic">{name_en}</p>
       )}
 
       <div className="mt-4 pt-4 border-t border-line/70 flex items-center justify-between">
-        <span className="text-xs text-stone numeric">
-          {count ? `${count} ${count === 1 ? "profesionist" : "profesionistë"}` : "Të jesh i pari"}
-        </span>
-        <span className="text-xs text-forest font-medium">
-          Shih →
-        </span>
+        <span className="text-xs text-stone numeric">{countLabel}</span>
+        <span className="text-xs text-forest font-medium">{seeLabel}</span>
       </div>
     </Link>
   );

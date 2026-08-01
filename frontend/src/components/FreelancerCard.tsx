@@ -37,6 +37,8 @@ export function FreelancerCard({
   locale?: UiLocale;
 }) {
   const t = STRINGS[locale];
+  const profileHref =
+    locale === "en" ? `/profesionist/${f.slug}?locale=en` : `/profesionist/${f.slug}`;
   const rate =
     f.hourly_rate_min || f.hourly_rate_max
       ? `${f.hourly_rate_min ?? "?"}–${f.hourly_rate_max ?? "?"} ${f.currency}`
@@ -45,7 +47,7 @@ export function FreelancerCard({
 
   return (
     <Link
-      href={`/profesionist/${f.slug}`}
+      href={profileHref}
       className="card card-link block p-5"
     >
       <div className="flex items-start gap-3">

@@ -11,7 +11,9 @@ import {
 } from "@/lib/api";
 import { Button } from "@/components/Button";
 import { Field, TextareaField } from "@/components/Field";
+import { RateWarningBanner } from "@/components/RateWarningBanner";
 import { StatusBadge } from "@/components/StatusBadge";
+import { isBelowMarket, useRateBenchmark } from "@/lib/use-rate-benchmark";
 
 export default function OpenJobDetailPage() {
   const params = useParams<{ id: string }>();
@@ -139,6 +141,13 @@ function QuotePanel({
   const [message, setMessage] = useState(existing?.message ?? "");
   const [submitting, setSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const { benchmark } = useRateBenchmark({
+    category: job.category.slug,
+    city: job.city,
+    currency,
+  });
+  const showRateWarning = isBelowMarket(price, benchmark);
 
   // Sync local state when the underlying quote changes (e.g. status update).
   useEffect(() => {
@@ -306,6 +315,8 @@ function QuotePanel({
           </select>
         </div>
       </div>
+
+      {showRateWarning && <RateWarningBanner />}
 
       <TextareaField
         label="Mesazhi"

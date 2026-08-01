@@ -7,46 +7,205 @@ import { PublicFooter } from "@/components/PublicFooter";
 import { PublicHeader } from "@/components/PublicHeader";
 import { SITE } from "@/lib/server-api";
 
-export const metadata: Metadata = {
-  title: `Si funksionon Gjej Pro | ${SITE.name}`,
-  description:
-    "Si të gjeni profesionistin e duhur në Shqipëri me Gjej Pro: postoni kërkesën, merrni oferta nga mjeshtra të verifikuar, zgjidhni më të mirin.",
-  alternates: { canonical: `${SITE.url}/si-funksionon` },
+const STRINGS = {
+  sq: {
+    metaTitle: `Si funksionon Gjej Pro | ${SITE.name}`,
+    metaDescription:
+      "Si të gjeni profesionistin e duhur në Shqipëri me Gjej Pro: postoni kërkesën, merrni oferta nga mjeshtra të verifikuar, zgjidhni më të mirin.",
+    heroKicker: "Si funksionon",
+    heroTitleLine1: "Nga kërkesa tek puna e përfunduar.",
+    heroTitleLine2: "Në 3 hapa.",
+    heroBody:
+      "Gjej Pro ndërton urën midis klientëve dhe profesionistëve të verifikuar në Shqipëri. Pa pagesë mujore, pa komisione të fshehura.",
+    imClient: "Jam klient",
+    imProfessional: "Jam profesionist",
+    forClientsKicker: "Për klientët",
+    forClientsHeading: "Si të gjeni profesionistin e duhur, në 3 hapa.",
+    clientStep1Title: "Postoni kërkesën tuaj",
+    clientStep1PreLink: "Përshkruani shkurt punën që dëshironi: kategoria (",
+    clientStep1LinkText: "shihni 22 kategori",
+    clientStep1PostLink:
+      "), qyteti, buxheti i preferuar, dhe çdo detaj që mund të ndihmojë profesionistët të kuptojnë skenarin tuaj. Sa më e qartë kërkesa, aq më të mira ofertat.",
+    clientStep2Title: "Merrni oferta nga profesionistë",
+    clientStep2Body:
+      "Profesionistët në kategorinë dhe zonën tuaj shohin kërkesën dhe dorëzojnë ofertën e tyre, me çmim dhe propozim konkret. Mund t'u dërgoni mesazh para se të vendosni, për të sqaruar pikat e paqarta.",
+    clientStep3Title: "Zgjidhni dhe nisni punën",
+    clientStep3PreEm: "Krahasoni çmimet, lexoni ",
+    clientStep3Em: "vlerësimet reale",
+    clientStep3PostEm:
+      " nga klientë të mëparshëm, dhe pranoni ofertën që ju përshtatet më mirë. Pasi puna përfundon, mund të lini një vlerësim që ndihmon komunitetin.",
+    forProsKicker: "Për profesionistët",
+    forProsHeading: "Si të merrni klientë, në 4 hapa.",
+    forProsSubheading:
+      "Pa pagesë mujore. Pa abonime. Gjej Pro nuk merr përqindje nga vlera e punës.",
+    proStep1Title: "Krijoni profilin tuaj",
+    proStep1Body:
+      "Përshkruani eksperiencën, listoni shërbimet që ofroni dhe caktoni zonat ku punoni. Shtoni një foto profili dhe (opsionalisht) kompaninë tuaj. Verifikimi i identitetit bëhet brenda pak ditëve.",
+    proStep2Title: "Shihni kërkesat e hapura",
+    proStep2Body:
+      "Filtroni sipas kategorisë dhe qytetit. Shfaqen automatikisht kërkesat që përshtaten me profilin tuaj. Mund t'u dërgoni mesazh klientëve për detaje shtesë para se të dorëzoni një ofertë.",
+    proStep3Title: "Dorëzoni ofertën tuaj",
+    proStep3PreEm: "Çmim, mesazh personal, kohë e propozuar. Klienti shikon dhe vendos. Çmimi që ofroni është çmimi që merrni: ",
+    proStep3Em: "100% e tij është e juaja.",
+    proStep3PostEm: "",
+    proStep4Title: "Punoni dhe ndërtoni reputacionin",
+    proStep4Body:
+      "Çdo punë e mirë sjell një vlerësim të vërtetë (vetëm klientët që kanë përfunduar një punë mund të vlerësojnë). Sa më shumë vlerësime pozitive, aq më shumë vizibilitet dhe punë në të ardhmen.",
+    eitherFirstKicker: "S'ka rëndësi cili vjen i pari",
+    eitherFirstHeading: "Të dyja anët mund të kërkojnë njëra-tjetrën.",
+    clientNoQuotesTitle: "Klient pa pritur ofertat?",
+    clientNoQuotesPreLink: "Mund të ",
+    clientNoQuotesLinkText: "shfletoni profesionistët",
+    clientNoQuotesPostLink:
+      " direkt, t'i filtroni sipas kategorisë, qytetit ose vendndodhjes suaj, dhe t'i kontaktoni një nga një pa postuar fare një kërkesë.",
+    proNoRequestsTitle: "Profesionist pa kërkesa ende?",
+    proNoRequestsBody:
+      "Profili juaj është i dukshëm publikisht në Gjej Pro që në ditën e parë. Klientët mund t'ju gjejnë drejtpërdrejt përmes kategorive dhe qyteteve dhe t'ju kontaktojnë pa postuar kërkesë.",
+    benefitsKicker: "Avantazhet",
+    benefitsHeading: "Pse të zgjidhni Gjej Pro?",
+    benefit1Title: "Profesionistë të verifikuar",
+    benefit1Body: "Identiteti dhe kompania e tyre kontrollohen para se të lejohen të dorëzojnë oferta.",
+    benefit2Title: "Vlerësime reale",
+    benefit2Body: "Vetëm klientët që kanë përfunduar një punë mund të lënë vlerësim. Pa false reviews.",
+    benefit3Title: "Pa pagesa të fshehura",
+    benefit3Body: "Klientët nuk paguajnë asnjë komision Gjej Pro. Çmimi që ofron profesionisti është çmimi që paguani.",
+    benefit4Title: "Komunikim direkt",
+    benefit4Body: "Mesazhe brenda platformës. Sqaroni detajet para se të pranoni një ofertë.",
+    ctaTitle: "Gati për të nisur?",
+    ctaBody: "Krijoni një llogari falas, si klient ose si profesionist. Asnjë kosto, asnjë angazhim.",
+    ctaClient: "Regjistrohu si klient",
+    ctaFreelancer: "Regjistrohu si profesionist",
+  },
+  en: {
+    metaTitle: `How Gjej Pro works | ${SITE.name}`,
+    metaDescription:
+      "How to find the right Albanian professional with Gjej Pro: post your request, get quotes from verified pros, choose the best one.",
+    heroKicker: "How it works",
+    heroTitleLine1: "From request to finished job.",
+    heroTitleLine2: "In 3 steps.",
+    heroBody:
+      "Gjej Pro bridges clients and verified Albanian professionals. No monthly fees, no hidden commissions.",
+    imClient: "I'm a client",
+    imProfessional: "I'm a professional",
+    forClientsKicker: "For clients",
+    forClientsHeading: "How to find the right professional, in 3 steps.",
+    clientStep1Title: "Post your request",
+    clientStep1PreLink: "Briefly describe the job you need: the category (",
+    clientStep1LinkText: "see 22 categories",
+    clientStep1PostLink:
+      "), the city, your preferred budget, and any detail that helps professionals understand your situation. The clearer the request, the better the quotes.",
+    clientStep2Title: "Get quotes from professionals",
+    clientStep2Body:
+      "Professionals in your category and area see the request and submit their quote, with a price and a concrete proposal. You can message them before deciding, to clarify anything unclear.",
+    clientStep3Title: "Choose and start the job",
+    clientStep3PreEm: "Compare prices, read ",
+    clientStep3Em: "real reviews",
+    clientStep3PostEm:
+      " from past clients, and accept the quote that suits you best. Once the job is done, you can leave a review that helps the community.",
+    forProsKicker: "For professionals",
+    forProsHeading: "How to get clients, in 4 steps.",
+    forProsSubheading:
+      "No monthly fee. No subscriptions. Gjej Pro doesn't take a cut of the job's value.",
+    proStep1Title: "Create your profile",
+    proStep1Body:
+      "Describe your experience, list the services you offer, and set the areas you work in. Add a profile photo and (optionally) your company. Identity verification is done within a few days.",
+    proStep2Title: "See open requests",
+    proStep2Body:
+      "Filter by category and city. Requests that match your profile show up automatically. You can message clients for extra details before submitting a quote.",
+    proStep3Title: "Submit your quote",
+    proStep3PreEm:
+      "Price, personal message, proposed timing. The client sees it and decides. The price you offer is the price you get: ",
+    proStep3Em: "100% of it is yours.",
+    proStep3PostEm: "",
+    proStep4Title: "Work and build your reputation",
+    proStep4Body:
+      "Every good job brings a genuine review (only clients who've completed a job can leave one). The more positive reviews, the more visibility and future work.",
+    eitherFirstKicker: "It doesn't matter who goes first",
+    eitherFirstHeading: "Either side can search for the other.",
+    clientNoQuotesTitle: "Client who doesn't want to wait for quotes?",
+    clientNoQuotesPreLink: "You can ",
+    clientNoQuotesLinkText: "browse professionals",
+    clientNoQuotesPostLink:
+      " directly, filter by category, city, or your location, and contact them one by one without posting a request at all.",
+    proNoRequestsTitle: "Professional with no requests yet?",
+    proNoRequestsBody:
+      "Your profile is publicly visible on Gjej Pro from day one. Clients can find you directly through categories and cities and contact you without posting a request.",
+    benefitsKicker: "Benefits",
+    benefitsHeading: "Why choose Gjej Pro?",
+    benefit1Title: "Verified professionals",
+    benefit1Body: "Their identity and company are checked before they're allowed to submit quotes.",
+    benefit2Title: "Real reviews",
+    benefit2Body: "Only clients who've completed a job can leave a review. No fake reviews.",
+    benefit3Title: "No hidden fees",
+    benefit3Body: "Clients don't pay any Gjej Pro commission. The price the professional offers is the price you pay.",
+    benefit4Title: "Direct communication",
+    benefit4Body: "In-platform messaging. Clarify details before accepting a quote.",
+    ctaTitle: "Ready to get started?",
+    ctaBody: "Create a free account, as a client or as a professional. No cost, no commitment.",
+    ctaClient: "Sign up as a client",
+    ctaFreelancer: "Sign up as a professional",
+  },
 };
 
-export default function HowItWorksPage() {
+type SearchParams = Promise<{ locale?: string }>;
+
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: SearchParams;
+}): Promise<Metadata> {
+  const { locale: localeParam } = await searchParams;
+  const locale = localeParam === "en" ? "en" : "sq";
+  const t = STRINGS[locale];
+  return {
+    title: t.metaTitle,
+    description: t.metaDescription,
+    alternates: { canonical: `${SITE.url}/si-funksionon` },
+  };
+}
+
+export default async function HowItWorksPage({
+  searchParams,
+}: {
+  searchParams: SearchParams;
+}) {
+  const { locale: localeParam } = await searchParams;
+  const locale = localeParam === "en" ? "en" : "sq";
+  const t = STRINGS[locale];
+  const q = locale === "en" ? "?locale=en" : "";
+  const qAmp = locale === "en" ? "&locale=en" : "";
+
   return (
     <>
-      <PublicHeader />
+      <PublicHeader locale={locale} />
       <main className="flex-1">
         <section className="relative">
           <HeroDecoration variant="warm" />
           <CornerLines position="top-right" />
           <div className="relative max-w-4xl mx-auto px-6 sm:px-8 py-16 sm:py-24">
             <p className="text-xs uppercase tracking-wider text-stone">
-              Si funksionon
+              {t.heroKicker}
             </p>
             <h1 className="font-display text-5xl sm:text-6xl mt-3 text-ink leading-[1.05]">
-              Nga kërkesa tek puna e përfunduar.
+              {t.heroTitleLine1}
               <br />
-              <span className="italic text-forest">Në 3 hapa.</span>
+              <span className="italic text-forest">{t.heroTitleLine2}</span>
             </h1>
             <p className="mt-5 text-lg text-ink-muted max-w-2xl leading-relaxed">
-              Gjej Pro ndërton urën midis klientëve dhe profesionistëve të
-              verifikuar në Shqipëri. Pa pagesë mujore, pa komisione të fshehura.
+              {t.heroBody}
             </p>
             <div className="mt-7 flex flex-wrap gap-3">
               <a
                 href="#per-klientet"
                 className="text-sm font-medium text-forest border border-forest/30 bg-forest/5 rounded-full px-4 py-2 hover:bg-forest/10"
               >
-                Jam klient
+                {t.imClient}
               </a>
               <a
                 href="#per-profesionistet"
                 className="text-sm font-medium text-forest border border-forest/30 bg-forest/5 rounded-full px-4 py-2 hover:bg-forest/10"
               >
-                Jam profesionist
+                {t.imProfessional}
               </a>
             </div>
           </div>
@@ -58,53 +217,47 @@ export default function HowItWorksPage() {
         >
           <div className="mb-8">
             <p className="text-xs uppercase tracking-wider text-stone">
-              Për klientët
+              {t.forClientsKicker}
             </p>
             <h2 className="font-display text-3xl sm:text-4xl mt-2 text-ink leading-tight">
-              Si të gjeni profesionistin e duhur, në 3 hapa.
+              {t.forClientsHeading}
             </h2>
           </div>
           <div className="space-y-6">
             <StepCard
               n={1}
-              title="Postoni kërkesën tuaj"
+              title={t.clientStep1Title}
               icon="bolt"
               tint="rgba(31, 77, 58, 0.08)"
               tintFg="#1F4D3A"
             >
-              Përshkruani shkurt punën që dëshironi: kategoria (
-              <Link href="/kategorite" className="text-forest hover:underline">
-                shihni 22 kategori
+              {t.clientStep1PreLink}
+              <Link href={`/kategorite${q}`} className="text-forest hover:underline">
+                {t.clientStep1LinkText}
               </Link>
-              ), qyteti, buxheti i preferuar, dhe çdo detaj që mund të ndihmojë
-              profesionistët të kuptojnë skenarin tuaj. Sa më e qartë kërkesa,
-              aq më të mira ofertat.
+              {t.clientStep1PostLink}
             </StepCard>
 
             <StepCard
               n={2}
-              title="Merrni oferta nga profesionistë"
+              title={t.clientStep2Title}
               icon="utensils"
               tint="rgba(46, 125, 91, 0.08)"
               tintFg="#2E7D5B"
             >
-              Profesionistët në kategorinë dhe zonën tuaj shohin kërkesën dhe
-              dorëzojnë ofertën e tyre, me çmim dhe propozim konkret. Mund t&apos;u
-              dërgoni mesazh para se të vendosni, për të sqaruar pikat e
-              paqarta.
+              {t.clientStep2Body}
             </StepCard>
 
             <StepCard
               n={3}
-              title="Zgjidhni dhe nisni punën"
+              title={t.clientStep3Title}
               icon="hammer"
               tint="rgba(201, 169, 97, 0.10)"
               tintFg="#A88847"
             >
-              Krahasoni çmimet, lexoni{" "}
-              <span className="font-medium">vlerësimet reale</span> nga klientë
-              të mëparshëm, dhe pranoni ofertën që ju përshtatet më mirë. Pasi
-              puna përfundon, mund të lini një vlerësim që ndihmon komunitetin.
+              {t.clientStep3PreEm}
+              <span className="font-medium">{t.clientStep3Em}</span>
+              {t.clientStep3PostEm}
             </StepCard>
           </div>
         </section>
@@ -115,65 +268,56 @@ export default function HowItWorksPage() {
         >
           <div className="mb-8">
             <p className="text-xs uppercase tracking-wider text-stone">
-              Për profesionistët
+              {t.forProsKicker}
             </p>
             <h2 className="font-display text-3xl sm:text-4xl mt-2 text-ink leading-tight">
-              Si të merrni klientë, në 4 hapa.
+              {t.forProsHeading}
             </h2>
             <p className="mt-3 text-base text-ink-muted max-w-2xl">
-              Pa pagesë mujore. Pa abonime. Gjej Pro nuk merr përqindje nga
-              vlera e punës.
+              {t.forProsSubheading}
             </p>
           </div>
           <div className="space-y-6">
             <StepCard
               n={1}
-              title="Krijoni profilin tuaj"
+              title={t.proStep1Title}
               icon="monitor"
               tint="rgba(31, 77, 58, 0.08)"
               tintFg="#1F4D3A"
             >
-              Përshkruani eksperiencën, listoni shërbimet që ofroni dhe caktoni
-              zonat ku punoni. Shtoni një foto profili dhe (opsionalisht)
-              kompaninë tuaj. Verifikimi i identitetit bëhet brenda pak ditëve.
+              {t.proStep1Body}
             </StepCard>
 
             <StepCard
               n={2}
-              title="Shihni kërkesat e hapura"
+              title={t.proStep2Title}
               icon="book"
               tint="rgba(46, 125, 91, 0.08)"
               tintFg="#2E7D5B"
             >
-              Filtroni sipas kategorisë dhe qytetit. Shfaqen automatikisht
-              kërkesat që përshtaten me profilin tuaj. Mund t&apos;u dërgoni
-              mesazh klientëve për detaje shtesë para se të dorëzoni një
-              ofertë.
+              {t.proStep2Body}
             </StepCard>
 
             <StepCard
               n={3}
-              title="Dorëzoni ofertën tuaj"
+              title={t.proStep3Title}
               icon="cake"
               tint="rgba(201, 169, 97, 0.10)"
               tintFg="#A88847"
             >
-              Çmim, mesazh personal, kohë e propozuar. Klienti shikon dhe
-              vendos. Çmimi që ofroni është çmimi që merrni:{" "}
-              <span className="font-medium">100% e tij është e juaja.</span>
+              {t.proStep3PreEm}
+              <span className="font-medium">{t.proStep3Em}</span>
+              {t.proStep3PostEm}
             </StepCard>
 
             <StepCard
               n={4}
-              title="Punoni dhe ndërtoni reputacionin"
+              title={t.proStep4Title}
               icon="hammer"
               tint="rgba(31, 77, 58, 0.08)"
               tintFg="#1F4D3A"
             >
-              Çdo punë e mirë sjell një vlerësim të vërtetë (vetëm klientët që
-              kanë përfunduar një punë mund të vlerësojnë). Sa më shumë
-              vlerësime pozitive, aq më shumë vizibilitet dhe punë në të
-              ardhmen.
+              {t.proStep4Body}
             </StepCard>
           </div>
         </section>
@@ -181,39 +325,32 @@ export default function HowItWorksPage() {
         <section className="max-w-5xl mx-auto px-6 sm:px-8 pt-6 pb-12">
           <div className="rounded-2xl border border-forest/20 bg-forest/5 p-6 sm:p-8">
             <p className="text-xs uppercase tracking-wider text-forest font-semibold">
-              S&apos;ka rëndësi cili vjen i pari
+              {t.eitherFirstKicker}
             </p>
             <h3 className="font-display text-2xl sm:text-3xl text-ink mt-2 leading-tight">
-              Të dyja anët mund të kërkojnë njëra-tjetrën.
+              {t.eitherFirstHeading}
             </h3>
             <div className="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-5 text-sm text-ink-muted leading-relaxed">
               <div>
                 <p className="font-medium text-ink mb-1">
-                  Klient pa pritur ofertat?
+                  {t.clientNoQuotesTitle}
                 </p>
                 <p>
-                  Mund të{" "}
+                  {t.clientNoQuotesPreLink}
                   <Link
-                    href="/profesionistet"
+                    href={`/profesionistet${q}`}
                     className="text-forest font-medium hover:underline"
                   >
-                    shfletoni profesionistët
-                  </Link>{" "}
-                  direkt, t&apos;i filtroni sipas kategorisë, qytetit ose
-                  vendndodhjes suaj, dhe t&apos;i kontaktoni një nga një pa
-                  postuar fare një kërkesë.
+                    {t.clientNoQuotesLinkText}
+                  </Link>
+                  {t.clientNoQuotesPostLink}
                 </p>
               </div>
               <div>
                 <p className="font-medium text-ink mb-1">
-                  Profesionist pa kërkesa ende?
+                  {t.proNoRequestsTitle}
                 </p>
-                <p>
-                  Profili juaj është i dukshëm publikisht në Gjej Pro që në
-                  ditën e parë. Klientët mund t&apos;ju gjejnë drejtpërdrejt
-                  përmes kategorive dhe qyteteve dhe t&apos;ju kontaktojnë
-                  pa postuar kërkesë.
-                </p>
+                <p>{t.proNoRequestsBody}</p>
               </div>
             </div>
           </div>
@@ -224,32 +361,16 @@ export default function HowItWorksPage() {
                style={{ background: "radial-gradient(closest-side, rgba(46, 125, 91, 0.10), transparent)" }} />
           <div className="relative max-w-5xl mx-auto px-6 sm:px-8 py-16">
             <p className="text-xs uppercase tracking-wider text-stone mb-2">
-              Avantazhet
+              {t.benefitsKicker}
             </p>
             <h2 className="font-display text-3xl sm:text-4xl text-ink">
-              Pse të zgjidhni Gjej Pro?
+              {t.benefitsHeading}
             </h2>
             <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-5">
-              <BenefitCard
-                title="Profesionistë të verifikuar"
-                body="Identiteti dhe kompania e tyre kontrollohen para se të lejohen të dorëzojnë oferta."
-                icon="key"
-              />
-              <BenefitCard
-                title="Vlerësime reale"
-                body="Vetëm klientët që kanë përfunduar një punë mund të lënë vlerësim. Pa false reviews."
-                icon="book"
-              />
-              <BenefitCard
-                title="Pa pagesa të fshehura"
-                body="Klientët nuk paguajnë asnjë komision Gjej Pro. Çmimi që ofron profesionisti është çmimi që paguani."
-                icon="cake"
-              />
-              <BenefitCard
-                title="Komunikim direkt"
-                body="Mesazhe brenda platformës. Sqaroni detajet para se të pranoni një ofertë."
-                icon="monitor"
-              />
+              <BenefitCard title={t.benefit1Title} body={t.benefit1Body} icon="key" />
+              <BenefitCard title={t.benefit2Title} body={t.benefit2Body} icon="book" />
+              <BenefitCard title={t.benefit3Title} body={t.benefit3Body} icon="cake" />
+              <BenefitCard title={t.benefit4Title} body={t.benefit4Body} icon="monitor" />
             </div>
           </div>
         </section>
@@ -259,28 +380,25 @@ export default function HowItWorksPage() {
             <div className="absolute -top-32 -right-32 w-[400px] h-[400px] rounded-full opacity-30"
                  style={{ background: "radial-gradient(closest-side, rgba(201, 169, 97, 0.30), transparent)" }} />
             <div className="relative">
-              <h2 className="font-display text-3xl sm:text-4xl">Gati për të nisur?</h2>
-              <p className="mt-3 text-white/80 max-w-2xl">
-                Krijoni një llogari falas, si klient ose si profesionist.
-                Asnjë kosto, asnjë angazhim.
-              </p>
+              <h2 className="font-display text-3xl sm:text-4xl">{t.ctaTitle}</h2>
+              <p className="mt-3 text-white/80 max-w-2xl">{t.ctaBody}</p>
               <div className="mt-6 flex flex-wrap gap-2">
-                <Link href="/regjistrohu?role=klient">
+                <Link href={`/regjistrohu?role=klient${qAmp}`}>
                   <Button
                     variant="primary"
                     size="lg"
                     className="!bg-white !text-forest hover:!bg-white/90"
                   >
-                    Regjistrohu si klient
+                    {t.ctaClient}
                   </Button>
                 </Link>
-                <Link href="/regjistrohu?role=freelancer">
+                <Link href={`/regjistrohu?role=freelancer${qAmp}`}>
                   <Button
                     variant="secondary"
                     size="lg"
                     className="!bg-transparent !text-white !border-white/40 hover:!bg-white/10"
                   >
-                    Regjistrohu si profesionist
+                    {t.ctaFreelancer}
                   </Button>
                 </Link>
               </div>
@@ -288,7 +406,7 @@ export default function HowItWorksPage() {
           </div>
         </section>
       </main>
-      <PublicFooter />
+      <PublicFooter locale={locale} />
     </>
   );
 }

@@ -7,6 +7,7 @@ from .views import (
     FreelancerListView,
     MyServiceAreaViewSet,
     MyServiceViewSet,
+    RateBenchmarkView,
 )
 
 app_name = "catalog"
@@ -23,5 +24,6 @@ urlpatterns = [
         FreelancerDetailView.as_view(),
         name="freelancers-detail",
     ),
+    path("rate-benchmark/", RateBenchmarkView.as_view(), name="rate-benchmark"),
     path("", include(router.urls)),
 ]
