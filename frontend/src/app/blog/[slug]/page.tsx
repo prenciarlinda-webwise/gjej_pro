@@ -33,7 +33,7 @@ export async function generateMetadata({ params, searchParams }: RouteParams): P
   const { locale: localeParam } = await searchParams;
   const locale = localeParam === "en" ? "en" : "sq";
   const t = STRINGS[locale];
-  const post = await serverApi.blogPost(slug);
+  const post = await serverApi.blogPost(slug, { strict: true });
   if (!post) return { title: t.notFoundTitle };
   return {
     title: `${post.title} | ${SITE.name} Blog`,
@@ -58,7 +58,7 @@ export default async function BlogPostPage({ params, searchParams }: RouteParams
   const locale = localeParam === "en" ? "en" : "sq";
   const t = STRINGS[locale];
   const q = locale === "en" ? "?locale=en" : "";
-  const post = await serverApi.blogPost(slug);
+  const post = await serverApi.blogPost(slug, { strict: true });
   if (!post) notFound();
 
   return (

@@ -70,11 +70,11 @@ export async function generateMetadata({ params, searchParams }: RouteParams): P
   const { locale: localeParam } = await searchParams;
   const locale = localeParam === "en" ? "en" : "sq";
   const t = STRINGS[locale];
-  const userId = await serverApi.resolveFreelancerSlug(slug);
+  const userId = await serverApi.resolveFreelancerSlug(slug, { strict: true });
   if (!userId) {
     return { title: t.notFoundTitle };
   }
-  const profile = await serverApi.freelancer(userId);
+  const profile = await serverApi.freelancer(userId, { strict: true });
   if (!profile) {
     return { title: t.notFoundTitle };
   }
@@ -109,12 +109,12 @@ export default async function FreelancerDetailPage({ params, searchParams }: Rou
   const locale = localeParam === "en" ? "en" : "sq";
   const t = STRINGS[locale];
   const q = locale === "en" ? "?locale=en" : "";
-  const userId = await serverApi.resolveFreelancerSlug(slug);
+  const userId = await serverApi.resolveFreelancerSlug(slug, { strict: true });
   if (!userId) {
     notFound();
   }
   const [profile, reviews] = await Promise.all([
-    serverApi.freelancer(userId),
+    serverApi.freelancer(userId, { strict: true }),
     serverApi.freelancerReviews(userId),
   ]);
 

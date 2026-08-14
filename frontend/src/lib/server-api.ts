@@ -38,6 +38,15 @@ const BASE =
 interface SsrFetchOptions {
   /** Cache strategy. "no-store" disables caching; a number triggers ISR. */
   revalidate?: number | false;
+  /**
+   * When true, any failure other than a real 404 (5xx, network error,
+   * timeout, bad JSON) throws instead of resolving to `null` — so it
+   * surfaces as a transient 500 rather than a permanent "not found". Use
+   * this for single-item/detail lookups whose result feeds a notFound()
+   * call. Leave off (default) for listing/aggregate calls that should
+   * degrade gracefully to an empty result instead of crashing the page.
+   */
+  strict?: boolean;
 }
 
 async function ssrFetch<T>(path: string, opts: SsrFetchOptions = {}): Promise<T | null> {
@@ -57,15 +66,17 @@ async function ssrFetch<T>(path: string, opts: SsrFetchOptions = {}): Promise<T 
       ...(opts.revalidate === false ? { cache: "no-store" } : { next }),
       headers: { Accept: "application/json" },
     });
-    if (!res.ok) return null;
+    if (res.status === 404) return null;
+    if (!res.ok) throw new Error(`ssrFetch ${path} failed: ${res.status} ${res.statusText}`);
     return (await res.json()) as T;
-  } catch {
+  } catch (err) {
+    if (opts.strict) throw err;
     return null;
   }
 }
 
 export const serverApi = {
-  categories: () => ssrFetch<Category[]>("/categories/"),
+  categories: (opts?: SsrFetchOptions) => ssrFetch<Category[]>("/categories/", opts),
 
   searchFreelancers: (params: {
     q?: string;
@@ -125,15 +136,19 @@ export const serverApi = {
   },
 
   /** Resolve a public slug to the underlying numeric user_id. */
-  resolveFreelancerSlug: async (slug: string): Promise<number | null> => {
+  resolveFreelancerSlug: async (
+    slug: string,
+    opts?: SsrFetchOptions,
+  ): Promise<number | null> => {
     const res = await ssrFetch<PaginatedResponse<FreelancerListItem>>(
       `/freelancers/?slug=${encodeURIComponent(slug)}`,
+      opts,
     );
     return res?.results?.[0]?.id ?? null;
   },
 
-  freelancer: (id: number) =>
-    ssrFetch<FreelancerDetail>(`/freelancers/${id}/`),
+  freelancer: (id: number, opts?: SsrFetchOptions) =>
+    ssrFetch<FreelancerDetail>(`/freelancers/${id}/`, opts),
 
   freelancerReviews: (id: number) =>
     ssrFetch<PaginatedResponse<ReviewItem>>(`/freelancers/${id}/reviews/`),
@@ -141,8 +156,8 @@ export const serverApi = {
   blogPosts: () =>
     ssrFetch<PaginatedResponse<BlogPostListItem>>("/blog/posts/"),
 
-  blogPost: (slug: string) =>
-    ssrFetch<BlogPostDetail>(`/blog/posts/${encodeURIComponent(slug)}/`),
+  blogPost: (slug: string, opts?: SsrFetchOptions) =>
+    ssrFetch<BlogPostDetail>(`/blog/posts/${encodeURIComponent(slug)}/`, opts),
 };
 
 // City list for /qytete pages (Albanian-first, with English-safe slugs).
@@ -171,12 +186,31 @@ export function findCityBySlug(slug: string) {
   return ALBANIAN_CITIES.find((c) => c.slug === slug.toLowerCase());
 }
 
+// NEXT_PUBLIC_SITE_URL feeds the sitemap, robots.txt, metadataBase, every
+// page's canonical/OG tags, and the JSON-LD structured data. Falling back
+// to localhost is fine in dev, but silently doing that in production once
+// shipped a sitemap full of "http://localhost:3002/..." URLs to Google —
+// so in production, a missing value is a hard error instead of a silent
+// fallback.
+function resolveSiteUrl(): string {
+  const url = process.env.NEXT_PUBLIC_SITE_URL;
+  if (url) return url;
+  if (process.env.NODE_ENV === "production") {
+    throw new Error(
+      "NEXT_PUBLIC_SITE_URL is not set. Refusing to build/serve with a " +
+        "localhost fallback in production — this breaks the sitemap, " +
+        "canonical tags, and structured data.",
+    );
+  }
+  return "http://localhost:3002";
+}
+
 export const SITE = {
   name: "Gjej Pro",
   tagline: "Profesionistë për ju",
   description:
     "Platforma më e madhe shqiptare për të gjetur mjeshtër dhe profesionistë të verifikuar: elektricistë, hidraulikë, bravandreqës, pastrues e shumë të tjerë.",
-  url: process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3002",
+  url: resolveSiteUrl(),
   // The only locale actually served today. Content is Albanian-language,
   // targeted at Albania; use this (not a bare "sq") anywhere a BCP-47 tag
   // is needed (html lang, og:locale, hreflang).
@@ -188,7 +222,7 @@ export const SITE = {
  * for an Albanian audience; the US/UK sections are English-language, aimed
  * at both the Albanian diaspora and local clients hiring Albanian
  * professionals there. `path` is the subdirectory prefix (e.g. `/uk` ->
- * gjejpro.al/uk/...).
+ * gjejpro.com/uk/...).
  *
  * `alternates.languages` is wired on every page pair using this list —
  * that's the only change needed to keep hreflang correct across the site.

@@ -16,7 +16,7 @@ import { serverApi, SITE, hreflangAlternates } from "@/lib/server-api";
 import type { CountryConfig } from "@/lib/countries";
 
 async function getCategory(slug: string) {
-  const cats = await serverApi.categories();
+  const cats = await serverApi.categories({ strict: true });
   return cats?.find((c) => c.slug === slug.toLowerCase()) ?? null;
 }
 
