@@ -24,7 +24,7 @@ interface RouteParams {
 }
 
 async function getCategory(slug: string) {
-  const cats = await serverApi.categories();
+  const cats = await serverApi.categories({ strict: true });
   return cats?.find((c) => c.slug === slug.toLowerCase()) ?? null;
 }
 
@@ -34,6 +34,8 @@ export async function generateMetadata({ params }: RouteParams): Promise<Metadat
   if (!cat) return { title: `Faqja nuk u gjet | ${SITE.name}` };
   const title = `${cat.name} në Shqipëri | Gjej profesionistin | ${SITE.name}`;
   const description = `Gjeni ${cat.name.toLowerCase()} të verifikuar në Shqipëri. Krahasoni çmimet, vlerësimet dhe zonat e punës. Përgjigje brenda orëve.`;
+  const list = await serverApi.searchFreelancers({ category: slug, page_size: 1 });
+  const total = list?.count ?? 0;
   return {
     title,
     description,
@@ -41,6 +43,10 @@ export async function generateMetadata({ params }: RouteParams): Promise<Metadat
       canonical: `${SITE.url}/${slug}`,
       languages: hreflangAlternates(`/${slug}`),
     },
+    // Don't index an empty category page — avoid thin content while supply
+    // is still zero. Flips to indexable the moment the first freelancer
+    // lists here. Mirrors CategoryCountryView's UK/US equivalent.
+    robots: total > 0 ? undefined : { index: false, follow: true },
     openGraph: {
       title,
       description,
